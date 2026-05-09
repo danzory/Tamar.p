@@ -1,941 +1,628 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tamar App</title>
-  
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <script crossorigin src="https://unpkg.com/recharts/umd/Recharts.js"></script>
-  
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <style>
-    body { 
-      margin: 0; 
-      padding: 0; 
-      background-color: #0C0C0E; 
-      -webkit-tap-highlight-color: transparent;
-    }
-  </style>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0C0C0E">
+<title>תמר ס׳ | Coached by Dan Z</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&family=Frank+Ruhl+Libre:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;background:#0C0C0E}
+  body{font-family:'Heebo',sans-serif;direction:rtl;color:#F0EBE1;-webkit-tap-highlight-color:transparent}
+  ::-webkit-scrollbar{display:none}
+  input{outline:none}
+</style>
 </head>
 <body>
-  <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+const { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } = Recharts;
 
-  <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
-    const { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } = window.Recharts;
+const GOLD=”#C9A84C”,GOLD_DIM=”#7A5E1A”,BG=”#0C0C0E”,CARD=”#161618”,CARD2=”#1F1F23”,
+TEXT=”#F0EBE1”,MUTED=”#4A4A50”,MUTED2=”#888”,GREEN=”#4A9A50”,BLUE=”#4A7BAA”,
+ORANGE=”#C06640”,RED=”#A84040”;
+const TARGET_CAL=1750,CUR_W=66.3,GOAL_W=62.0,START_W=69.2,RATE=0.28;
 
-    const GOLD = "#C9A84C";
-    const GOLD_DIM = "#7A5E1A";
-    const BG = "#0C0C0E";
-    const CARD = "#161618";
-    const CARD2 = "#1F1F23";
-    const TEXT = "#F0EBE1";
-    const MUTED = "#4A4A50";
-    const MUTED2 = "#888";
-    const GREEN = "#4A9A50";
-    const BLUE = "#4A7BAA";
-    const ORANGE = "#C06640";
-    const RED = "#A84040";
+const weightData=[
+{date:“1/3”,w:69.2,trend:69.2},{date:“8/3”,w:68.8,trend:69.0},
+{date:“15/3”,w:68.5,trend:68.8},{date:“22/3”,w:68.9,trend:68.7},
+{date:“29/3”,w:68.1,trend:68.5},{date:“5/4”,w:67.8,trend:68.2},
+{date:“12/4”,w:67.4,trend:67.9},{date:“19/4”,w:67.6,trend:67.7},
+{date:“26/4”,w:67.0,trend:67.4},{date:“3/5”,w:66.6,trend:67.1},
+{date:“7/5”,w:66.3,trend:66.8},
+];
+const weeklyLog=[
+{day:“א’”,cal:1520,ok:true},{day:“ב’”,cal:1390,ok:true},{day:“ג’”,cal:0,ok:false},
+{day:“ד’”,cal:1680,ok:true},{day:“ה’”,cal:1450,ok:true},{day:“ו’”,cal:1510,ok:true},
+{day:“ש’”,cal:1320,ok:true},
+];
+const MEALS=[
+{id:1,name:“ארוחת בוקר”,items:[“2 ביצים”,“לחם מלא ×2”,“גבינה לבנה 5%”],cal:380,p:28,c:34,f:14},
+{id:2,name:“צהריים”,items:[“חזה עוף 150g”,“אורז מלא 80g”,“ירקות מאודים”],cal:520,p:42,c:58,f:8},
+{id:3,name:“ביניים”,items:[“קוטג׳ 5%”,“בננה”],cal:220,p:18,c:30,f:5},
+];
+const INIT_EX=[
+{id:1,name:“לחיצת חזה”,sets:4,reps:10,tw:45,pr:“52 ק״ג”},
+{id:2,name:“חתירה בטה”,sets:4,reps:10,tw:40,pr:“48 ק״ג”},
+{id:3,name:“לחיצת כתפיים”,sets:3,reps:10,tw:22.5,pr:“27.5 ק״ג”},
+{id:4,name:“תלייה מורחבת”,sets:3,reps:8,tw:0,pr:null,bw:true},
+{id:5,name:“כפיפות מרפק”,sets:3,reps:12,tw:12,pr:“15 ק״ג”},
+];
+const PRS=[
+{name:“סקוואט”,val:80,prev:75,date:“15/4”,unit:“ק״ג”,medal:“🥇”},
+{name:“לחיצת חזה”,val:52,prev:47.5,date:“22/4”,unit:“ק״ג”,medal:“🥈”},
+{name:“דדליפט”,val:90,prev:85,date:“28/4”,unit:“ק״ג”,medal:“🥉”},
+{name:“לחיצת כתפיים”,val:27.5,prev:25,date:“5/5”,unit:“ק״ג”,medal:“🏅”},
+{name:“תלייה”,val:10,prev:8,date:“2/5”,unit:“חז’”,medal:“🏅”},
+];
 
-    const TARGET_CAL = 1750;
-    const CURRENT_WEIGHT = 66.3;
-    const GOAL_WEIGHT = 62.0;
-    const START_WEIGHT = 69.2;
-    const RATE_PER_WEEK = 0.28;
+const loggedDays=weeklyLog.filter(d=>d.ok);
+const avgCal=Math.round(loggedDays.reduce((a,d)=>a+d.cal,0)/loggedDays.length);
+const dailyDef=Math.round((RATE*7700)/7);
+const TDEE=avgCal+dailyDef;
+const adh=Math.round((loggedDays.length/7)*100);
+const weeksLeft=Math.ceil((CUR_W-GOAL_W)/RATE);
+const progPct=Math.round(((START_W-CUR_W)/(START_W-GOAL_W))*100);
+const totCal=MEALS.reduce((a,m)=>a+m.cal,0);
+const totP=MEALS.reduce((a,m)=>a+m.p,0);
+const totC=MEALS.reduce((a,m)=>a+m.c,0);
+const totF=MEALS.reduce((a,m)=>a+m.f,0);
 
-    const weightData = [
-      { date: "1/3",  w: 69.2, trend: 69.2 },
-      { date: "8/3",  w: 68.8, trend: 69.0 },
-      { date: "15/3", w: 68.5, trend: 68.8 },
-      { date: "22/3", w: 68.9, trend: 68.7 },
-      { date: "29/3", w: 68.1, trend: 68.5 },
-      { date: "5/4",  w: 67.8, trend: 68.2 },
-      { date: "12/4", w: 67.4, trend: 67.9 },
-      { date: "19/4", w: 67.6, trend: 67.7 },
-      { date: "26/4", w: 67.0, trend: 67.4 },
-      { date: "3/5",  w: 66.6, trend: 67.1 },
-      { date: "7/5",  w: 66.3, trend: 66.8 },
-    ];
+const todayStr=()=>{
+const days=[“ראשון”,“שני”,“שלישי”,“רביעי”,“חמישי”,“שישי”,“שבת”];
+const months=[“ינואר”,“פברואר”,“מרץ”,“אפריל”,“מאי”,“יוני”,“יולי”,“אוגוסט”,“ספטמבר”,“אוקטובר”,“נובמבר”,“דצמבר”];
+const d=new Date();
+return `יום ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+};
 
-    const weeklyLog = [
-      { day: "א'", cal: 1520, logged: true },
-      { day: "ב'", cal: 1390, logged: true },
-      { day: "ג'", cal: 0,    logged: false },
-      { day: "ד'", cal: 1680, logged: true },
-      { day: "ה'", cal: 1450, logged: true },
-      { day: "ו'", cal: 1510, logged: true },
-      { day: "ש'", cal: 1320, logged: true },
-    ];
+// ── UI Atoms ──
+function Card({children,style={},onClick}){
+return <div onClick={onClick} style={{background:CARD,borderRadius:18,padding:16,border:“1px solid #1E1E22”,cursor:onClick?“pointer”:“default”,…style}}>{children}</div>;
+}
+function STitle({children}){
+return <div style={{fontSize:10,fontWeight:800,letterSpacing:3,color:MUTED2,textTransform:“uppercase”,marginBottom:12}}>{children}</div>;
+}
+function BarUI({value,max,color,h=7}){
+const p=Math.min(100,Math.round((value/max)*100));
+return <div style={{background:”#252528”,borderRadius:99,height:h,overflow:“hidden”}}>
+<div style={{width:`${p}%`,height:“100%”,background:color,borderRadius:99,transition:“width 0.7s”}}/>
 
-    const MEALS = [
-      { id: 1, name: "ארוחת בוקר", items: ["2 ביצים", "לחם מלא ×2", "גבינה לבנה 5%"], cal: 380, p: 28, c: 34, f: 14 },
-      { id: 2, name: "צהריים", items: ["חזה עוף 150g", "אורז מלא 80g", "ירקות מאודים"], cal: 520, p: 42, c: 58, f: 8 },
-      { id: 3, name: "ביניים", items: ["קוטג׳ 5%", "בננה"], cal: 220, p: 18, c: 30, f: 5 },
-    ];
+  </div>;
+}
+function Ring({p,color,size=104,stroke=10,children}){
+  const r=(size-stroke)/2, circ=2*Math.PI*r, dash=(Math.min(100,p)/100)*circ;
+  return <div style={{position:"relative",width:size,height:size,flexShrink:0}}>
+    <svg width={size} height={size} style={{transform:"rotate(-90deg)"}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#252528" strokeWidth={stroke}/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+        strokeDasharray={`${dash} ${circ-dash}`} strokeLinecap="round"
+        style={{transition:"stroke-dasharray 0.7s"}}/>
+    </svg>
+    <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>{children}</div>
+  </div>;
+}
+function EnergyBar({intake,tdee}){
+  const diff=intake-tdee, isDef=diff<0;
+  const barPct=Math.min(48,(Math.abs(diff)/tdee)*100*3);
+  return <div>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:MUTED2,marginBottom:8}}>
+      <span>עודף</span>
+      <span style={{fontWeight:700,color:TEXT,fontSize:12}}>{isDef?"גירעון":"עודף"}: <span style={{color:isDef?GREEN:ORANGE}}>{Math.abs(diff)} קק״ל</span></span>
+      <span>גירעון</span>
+    </div>
+    <div style={{position:"relative",height:12,background:"#1E1E22",borderRadius:99}}>
+      <div style={{position:"absolute",left:"50%",top:0,bottom:0,width:2,background:"#333",transform:"translateX(-50%)"}}/>
+      <div style={{position:"absolute",top:2,bottom:2,borderRadius:99,background:isDef?GREEN:ORANGE,width:`${barPct}%`,right:isDef?"50%":undefined,left:isDef?undefined:"50%"}}/>
+    </div>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:MUTED,marginTop:5}}>
+      <span>↑ +500</span><span>TDEE: {tdee} קק״ל</span><span>↓ -500</span>
+    </div>
+  </div>;
+}
+function GoalETA(){
+  return <Card style={{background:"linear-gradient(135deg,#111A0E,#0C120A)",borderColor:"#1E3018"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+      <div>
+        <div style={{fontSize:10,color:GREEN,fontWeight:700,letterSpacing:1,marginBottom:3}}>ETA ליעד</div>
+        <div style={{fontSize:28,fontWeight:900}}>{weeksLeft} <span style={{fontSize:14,fontWeight:400,color:MUTED2}}>שבועות</span></div>
+        <div style={{fontSize:11,color:MUTED2,marginTop:2}}>{CUR_W} → {GOAL_W} ק״ג</div>
+      </div>
+      <Ring p={progPct} color={GREEN} size={72} stroke={7}>
+        <div style={{fontSize:13,fontWeight:900,color:GREEN}}>{progPct}%</div>
+      </Ring>
+    </div>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:MUTED2,marginBottom:6}}>
+      <span>התחלה {START_W}</span><span style={{color:GOLD}}>● {CUR_W} ק״ג</span><span>יעד {GOAL_W}</span>
+    </div>
+    <div style={{position:"relative",background:"#1E2A1E",borderRadius:99,height:8}}>
+      <div style={{width:`${progPct}%`,height:"100%",background:`linear-gradient(90deg,${GREEN}88,${GREEN})`,borderRadius:99,position:"relative"}}>
+        <div style={{position:"absolute",left:"100%",top:"50%",transform:"translate(-50%,-50%)",width:14,height:14,background:GOLD,borderRadius:"50%",border:"2px solid #0C120A",boxShadow:`0 0 8px ${GOLD}88`}}/>
+      </div>
+    </div>
+    <div style={{fontSize:11,color:MUTED2,marginTop:8}}>קצב: <span style={{color:GREEN,fontWeight:700}}>-{RATE} ק״ג/שבוע</span> · על פי EWMA</div>
+  </Card>;
+}
 
-    const INIT_EXERCISES = [
-      { id: 1, name: "לחיצת חזה", sets: 4, reps: 10, targetWeight: 45, logged: [], pr: 52 },
-      { id: 2, name: "חתירה בטה", sets: 4, reps: 10, targetWeight: 40, logged: [], pr: 48 },
-      { id: 3, name: "לחיצת כתפיים", sets: 3, reps: 10, targetWeight: 22.5, logged: [], pr: 27.5 },
-      { id: 4, name: "תלייה מורחבת", sets: 3, reps: 8,  targetWeight: 0, logged: [], pr: null, bw: true },
-      { id: 5, name: "כפיפות מרפק", sets: 3, reps: 12, targetWeight: 12, logged: [], pr: 15 },
-    ];
+// ── DASHBOARD ──
+function Dashboard({setTab}){
+const hour=new Date().getHours();
+const gr=hour<12?“בוקר טוב”:hour<17?“צהריים טובים”:“ערב טוב”;
+const diff=totCal-TDEE;
+return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:16}}>
+<div>
+<div style={{fontSize:12,color:MUTED2,marginBottom:3}}>{todayStr()}</div>
+<div style={{fontSize:30,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900,lineHeight:1.15}}>{gr},<br/><span style={{color:GOLD}}>תמר</span> ✨</div>
+</div>
+<Card style={{background:“linear-gradient(135deg,#1A1A0E,#141409)”,borderColor:”#2A2A10”}}>
+<div style={{display:“flex”,gap:12,alignItems:“flex-start”}}>
+<div style={{width:40,height:40,borderRadius:“50%”,flexShrink:0,background:`linear-gradient(135deg,${GOLD},${GOLD_DIM})`,display:“flex”,alignItems:“center”,justifyContent:“center”,fontWeight:800,fontSize:16,color:”#000”}}>ד</div>
+<div>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:5}}>דן מ׳ · עכשיו</div>
+<div style={{fontSize:13.5,lineHeight:1.65}}>תמר 🌟 על פי ה-EWMA את בקצב של -{RATE} ק״ג/שבוע. עוד {weeksLeft} שבועות ליעד! יאללה 💪</div>
+</div>
+</div>
+</Card>
+<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr 1fr”,gap:10}}>
+{[{l:“אימונים”,v:“3/4”,s:“השבוע”,c:GOLD},{l:“רצף”,v:“12”,s:“ימים 🔥”,c:”#E07030”},{l:“מעקב”,v:`${adh}%`,s:“השבוע”,c:BLUE}].map(s=>
+<Card key={s.l} style={{padding:“14px 10px”,textAlign:“center”}}>
+<div style={{fontSize:22,fontWeight:900,color:s.c}}>{s.v}</div>
+<div style={{fontSize:11,color:MUTED2,marginTop:2}}>{s.l}</div>
+<div style={{fontSize:10,color:MUTED,marginTop:1}}>{s.s}</div>
+</Card>
+)}
+</div>
+<Card style={{background:”#111114”,borderColor:”#222226”}}>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:14}}>
+<div>
+<div style={{fontSize:10,color:MUTED2,fontWeight:700,letterSpacing:1,marginBottom:3}}>TDEE · הוצאה יומית</div>
+<div style={{fontSize:24,fontWeight:900}}>{TDEE} <span style={{fontSize:13,color:MUTED2,fontWeight:400}}>קק״ל</span></div>
+</div>
+<div style={{textAlign:“center”,background:”#1A1A1E”,padding:“8px 14px”,borderRadius:12}}>
+<div style={{fontSize:11,color:MUTED2,marginBottom:2}}>ממוצע שבועי</div>
+<div style={{fontSize:18,fontWeight:800,color:GOLD}}>{avgCal}</div>
+<div style={{fontSize:10,color:MUTED2}}>קק״ל/יום</div>
+</div>
+</div>
+<EnergyBar intake={totCal} tdee={TDEE}/>
+</Card>
+<GoalETA/>
+<Card onClick={()=>setTab(“workout”)} style={{background:“linear-gradient(135deg,#1C1808,#111008)”,borderColor:”#2A2408”}}>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
+<div>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:5}}>אימון היום</div>
+<div style={{fontSize:19,fontWeight:800}}>כוח עילי A 💪</div>
+<div style={{fontSize:12,color:MUTED2,marginTop:4}}>5 תרגילים · ~55 דק׳</div>
+</div>
+<div style={{background:GOLD,color:”#000”,borderRadius:12,padding:“10px 18px”,fontWeight:900,fontSize:14,border:“none”}}>← פתח</div>
+</div>
+</Card>
+<div>
+<STitle>תזונה היום</STitle>
+<Card>
+<div style={{display:“flex”,gap:16,alignItems:“center”}}>
+<Ring p={Math.min(100,Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={100} stroke={9}>
+<div style={{textAlign:“center”}}>
+<div style={{fontSize:19,fontWeight:900,color:GOLD}}>{totCal}</div>
+<div style={{fontSize:9,color:MUTED2}}>/ {TARGET_CAL}</div>
+<div style={{fontSize:9,color:GREEN,fontWeight:600,marginTop:1}}>{TARGET_CAL-totCal} נותרו</div>
+</div>
+</Ring>
+<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:10}}>
+{[{l:“חלבון”,c:totP,t:130,col:GREEN},{l:“פחמימות”,c:totC,t:175,col:BLUE},{l:“שומן”,c:totF,t:58,col:ORANGE}].map(m=>
+<div key={m.l}>
+<div style={{display:“flex”,justifyContent:“space-between”,fontSize:11,marginBottom:4}}>
+<span style={{color:MUTED2}}>{m.l}</span>
+<span style={{fontWeight:700}}>{m.c}<span style={{color:MUTED,fontWeight:400}}>/{m.t}g</span></span>
+</div>
+<BarUI value={m.c} max={m.t} color={m.col} h={6}/>
+</div>
+)}
+</div>
+</div>
+</Card>
+</div>
 
-    const PRS_DATA = [
-      { exercise: "סקוואט",         w: 80,   prev: 75,   date: "15/4", unit: "ק״ג" },
-      { exercise: "לחיצת חזה",      w: 52,   prev: 47.5, date: "22/4", unit: "ק״ג" },
-      { exercise: "דדליפט",         w: 90,   prev: 85,   date: "28/4", unit: "ק״ג" },
-      { exercise: "לחיצת כתפיים",   w: 27.5, prev: 25,   date: "5/5",  unit: "ק״ג" },
-      { exercise: "תלייה",          w: null, reps: 10, prev: 8, date: "2/5", unit: "חז'" },
-    ];
+  </div>;
+}
 
-    const avgCalories = Math.round(
-      weeklyLog.filter(d => d.logged).reduce((a, d) => a + d.cal, 0) /
-      weeklyLog.filter(d => d.logged).length
-    );
-    const dailyDeficit = Math.round((RATE_PER_WEEK * 7700) / 7);
-    const estimatedTDEE = avgCalories + dailyDeficit;
-    const adherenceDays = weeklyLog.filter(d => d.logged).length;
-    const adherencePct = Math.round((adherenceDays / 7) * 100);
-    const weeksToGoal = Math.ceil((CURRENT_WEIGHT - GOAL_WEIGHT) / RATE_PER_WEEK);
+// ── WORKOUT ──
+function Workout(){
+const [exs,setExs]=useState(INIT_EX.map(e=>({…e,logged:[]})));
+const [sel,setSel]=useState(null);
+const [iReps,setIReps]=useState(””); const [iWeight,setIWeight]=useState(””);
+const [timerSec,setTimerSec]=useState(null); const [timerTotal,setTimerTotal]=useState(90);
+const intRef=useRef(null);
+const startTimer=secs=>{
+clearInterval(intRef.current); setTimerTotal(secs); setTimerSec(secs);
+intRef.current=setInterval(()=>setTimerSec(p=>{if(p<=1){clearInterval(intRef.current);return null;}return p-1;}),1000);
+};
+useEffect(()=>()=>clearInterval(intRef.current),[]);
+const logSet=ex=>{
+const reps=parseInt(iReps)||ex.reps, weight=iWeight!==’’?parseFloat(iWeight):ex.tw;
+setExs(prev=>prev.map(e=>e.id===ex.id?{…e,logged:[…e.logged,{reps,weight}]}:e));
+setIReps(””); setIWeight(””); startTimer(90);
+};
+const done=exs.filter(e=>e.logged.length>=e.sets).length;
+return <div style={{padding:“22px 16px 0”}}>
+<div style={{marginBottom:18}}>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:4}}>אימון היום</div>
+<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>כוח עילי A</div>
+<div style={{fontSize:12,color:MUTED2,marginTop:4}}>{done}/{exs.length} תרגילים</div>
+<div style={{marginTop:10}}><BarUI value={done} max={exs.length} color={GOLD} h={5}/></div>
+</div>
+{timerSec!==null&&<Card style={{background:”#1A1408”,borderColor:”#2E2510”,marginBottom:16,padding:“12px 16px”}}>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
+<div style={{fontSize:12,color:MUTED2}}>⏱ מנוחה</div>
+<div style={{fontSize:30,fontWeight:900,color:GOLD,fontVariantNumeric:“tabular-nums”}}>
+{String(Math.floor(timerSec/60)).padStart(2,“0”)}:{String(timerSec%60).padStart(2,“0”)}
+</div>
+<button onClick={()=>{clearInterval(intRef.current);setTimerSec(null);}} style={{background:”#2A2A2E”,border:“none”,color:TEXT,borderRadius:8,padding:“6px 12px”,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,fontSize:12}}>דלג</button>
+</div>
+<div style={{marginTop:8}}><BarUI value={timerTotal-timerSec} max={timerTotal} color={GOLD} h={4}/></div>
+</Card>}
+<div style={{display:“flex”,flexDirection:“column”,gap:12}}>
+{exs.map(ex=>{
+const isDone=ex.logged.length>=ex.sets, isOpen=sel===ex.id;
+return <Card key={ex.id} onClick={()=>!isDone&&setSel(isOpen?null:ex.id)}
+style={{borderColor:isDone?”#2A442A”:isOpen?”#2A2614”:”#1E1E22”,background:isDone?”#101A10”:isOpen?”#1A1A0E”:CARD}}>
+<div style={{display:“flex”,alignItems:“center”,gap:10}}>
+<div style={{width:28,height:28,borderRadius:“50%”,flexShrink:0,background:isDone?GREEN:”#252528”,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:12,fontWeight:700,color:isDone?”#fff”:MUTED2}}>
+{isDone?“✓”:ex.logged.length}
+</div>
+<div style={{flex:1}}>
+<div style={{display:“flex”,alignItems:“center”,gap:8,flexWrap:“wrap”}}>
+<span style={{fontSize:15,fontWeight:700}}>{ex.name}</span>
+{ex.pr&&<span style={{fontSize:9,background:”#2A1A06”,color:GOLD,padding:“2px 7px”,borderRadius:99,fontWeight:700}}>שיא {ex.pr}</span>}
+</div>
+<div style={{fontSize:12,color:MUTED2,marginTop:3}}>{ex.sets} × {ex.reps} חז’{!ex.bw&&` · יעד: ${ex.tw} ק״ג`}</div>
+</div>
+{!isDone&&<div style={{fontSize:16,color:isOpen?GOLD:MUTED,transform:isOpen?“rotate(180deg)”:“none”,transition:“transform 0.2s”}}>⌄</div>}
+</div>
+<div style={{display:“flex”,gap:6,marginTop:10,marginRight:38}}>
+{Array.from({length:ex.sets}).map((_,i)=>
+<div key={i} style={{width:36,height:36,borderRadius:10,background:i<ex.logged.length?GREEN:”#252528”,display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,fontSize:10,fontWeight:700,color:i<ex.logged.length?”#fff”:MUTED,transition:“background 0.3s”}}>
+{i<ex.logged.length?<><span>{ex.logged[i].reps}</span>{!ex.bw&&<span style={{fontSize:8,fontWeight:400,color:”#9fd09f”}}>{ex.logged[i].weight}k</span>}</>:<span style={{fontSize:11}}>{i+1}</span>}
+</div>
+)}
+</div>
+{isOpen&&!isDone&&<div style={{marginTop:14,paddingTop:14,borderTop:“1px solid #2A2A2E”,display:“flex”,gap:10,alignItems:“flex-end”}} onClick={e=>e.stopPropagation()}>
+<div style={{flex:1}}>
+<div style={{fontSize:10,color:MUTED2,marginBottom:5}}>חזרות</div>
+<input type=“number” value={iReps} placeholder={ex.reps} onChange={e=>setIReps(e.target.value)} style={{width:“100%”,background:”#252528”,border:“1px solid #333”,borderRadius:10,padding:10,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”,textAlign:“center”}}/>
+</div>
+{!ex.bw&&<div style={{flex:1}}>
+<div style={{fontSize:10,color:MUTED2,marginBottom:5}}>ק״ג</div>
+<input type=“number” value={iWeight} placeholder={ex.tw} onChange={e=>setIWeight(e.target.value)} style={{width:“100%”,background:”#252528”,border:“1px solid #333”,borderRadius:10,padding:10,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”,textAlign:“center”}}/>
+</div>}
+<button onClick={()=>logSet(ex)} style={{background:GOLD,color:”#000”,border:“none”,borderRadius:12,padding:“12px 18px”,fontWeight:900,fontSize:14,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,flexShrink:0}}>סט {ex.logged.length+1} ✓</button>
+</div>}
+</Card>;
+})}
+</div>
+{done===exs.length&&<Card style={{marginTop:20,background:“linear-gradient(135deg,#162016,#0E160E)”,borderColor:”#2A442A”,textAlign:“center”,padding:“28px 20px”}}>
+<div style={{fontSize:44,marginBottom:10}}>🎉</div>
+<div style={{fontSize:24,fontWeight:900,color:GREEN,fontFamily:”‘Frank Ruhl Libre’,serif”}}>האימון הושלם!</div>
+<div style={{fontSize:14,color:MUTED2,marginTop:6}}>כל הכבוד תמר! רצף 🔥</div>
+</Card>}
+<div style={{marginTop:24}}>
+<STitle>שיאים אישיים 🏆</STitle>
+<div style={{display:“flex”,flexDirection:“column”,gap:8}}>
+{PRS.map(pr=><Card key={pr.name} style={{padding:“12px 14px”}}>
+<div style={{display:“flex”,alignItems:“center”,gap:10}}>
+<span style={{fontSize:20}}>{pr.medal}</span>
+<div style={{flex:1}}>
+<div style={{fontSize:14,fontWeight:700}}>{pr.name}</div>
+<div style={{fontSize:11,color:MUTED2}}>{pr.date} · +{(pr.val-pr.prev).toFixed(1)} {pr.unit}</div>
+</div>
+<div style={{fontSize:22,fontWeight:900,color:GOLD}}>{pr.val} <span style={{fontSize:11,color:MUTED2}}>{pr.unit}</span></div>
+</div>
+</Card>)}
+</div>
+</div>
 
-    const todayStr = () => {
-      const days = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
-      const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
-      const d = new Date();
-      return `יום ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
-    };
+  </div>;
+}
 
-    // ── UI COMPONENTS ──────────────────────────────────────────────────────────
-    function Card({ children, style = {}, onClick }) {
-      return (
-        <div onClick={onClick} style={{ background: CARD, borderRadius: 18, padding: 16,
-        border: "1px solid #1E1E22", cursor: onClick ? "pointer" : "default", ...style }}>
-          {children}
-        </div>
-      );
-    }
+// ── NUTRITION ──
+function Nutrition(){
+const [water,setWater]=useState(1.8);
+return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:16}}>
+<div>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>יומן תזונה</div>
+<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>{todayStr()}</div>
+</div>
+<Card>
+<div style={{display:“flex”,gap:16,alignItems:“center”}}>
+<Ring p={Math.min(100,Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={112} stroke={10}>
+<div style={{textAlign:“center”}}>
+<div style={{fontSize:21,fontWeight:900,color:GOLD}}>{totCal}</div>
+<div style={{fontSize:9,color:MUTED2}}>/ {TARGET_CAL} קק״ל</div>
+<div style={{fontSize:10,color:GREEN,fontWeight:700,marginTop:2}}>{TARGET_CAL-totCal} נותרו</div>
+</div>
+</Ring>
+<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:10}}>
+{[{l:“🥩 חלבון”,c:totP,t:130,col:GREEN},{l:“🌾 פחמימות”,c:totC,t:175,col:BLUE},{l:“🫒 שומן”,c:totF,t:58,col:ORANGE}].map(m=>
+<div key={m.l}>
+<div style={{display:“flex”,justifyContent:“space-between”,fontSize:11,marginBottom:4}}>
+<span style={{color:MUTED2}}>{m.l}</span>
+<span style={{fontWeight:700}}>{m.c}<span style={{color:MUTED,fontWeight:400}}>/{m.t}g</span></span>
+</div>
+<BarUI value={m.c} max={m.t} color={m.col} h={7}/>
+</div>
+)}
+</div>
+</div>
+</Card>
+<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}}>
+<Card style={{textAlign:“center”,padding:“14px 10px”}}>
+<div style={{fontSize:10,color:MUTED2,marginBottom:4}}>ממוצע שבועי</div>
+<div style={{fontSize:22,fontWeight:900,color:GOLD}}>{avgCal}</div>
+<div style={{fontSize:10,color:MUTED2}}>קק״ל/יום</div>
+</Card>
+<Card style={{textAlign:“center”,padding:“14px 10px”}}>
+<div style={{fontSize:10,color:MUTED2,marginBottom:4}}>עמידה במעקב</div>
+<div style={{fontSize:22,fontWeight:900,color:adh>=80?GREEN:ORANGE}}>{adh}%</div>
+<div style={{fontSize:10,color:MUTED2}}>{loggedDays.length}/7 ימים</div>
+<div style={{display:“flex”,gap:3,justifyContent:“center”,marginTop:5}}>
+{weeklyLog.map((d,i)=><div key={i} style={{width:10,height:10,borderRadius:3,background:d.ok?GREEN:”#252528”}}/>)}
+</div>
+</Card>
+</div>
+<Card style={{padding:“14px 10px”}}>
+<div style={{fontSize:12,fontWeight:700,marginBottom:10}}>קלוריות לפי יום</div>
+<ResponsiveContainer width="100%" height={100}>
+<BarChart data={weeklyLog} margin={{top:4,right:4,left:0,bottom:0}}>
+<XAxis dataKey="day" tick={{fill:MUTED2,fontSize:10}} axisLine={false} tickLine={false}/>
+<YAxis hide domain={[0,2200]}/>
+<ReferenceLine y={TARGET_CAL} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1.5}/>
+<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:8,fontSize:11}} formatter={v=>v?[`${v} קק״ל`,””]:[” לא נרשם”,””]}/>
+<Bar dataKey="cal" radius={[6,6,0,0]}>
+{weeklyLog.map((d,i)=><Cell key={i} fill={!d.ok?”#252528”:Math.abs(d.cal-TARGET_CAL)<150?GREEN:GOLD}/>)}
+</Bar>
+</BarChart>
+</ResponsiveContainer>
+</Card>
+<STitle>ארוחות</STitle>
+<div style={{display:“flex”,flexDirection:“column”,gap:10}}>
+{MEALS.map(m=><Card key={m.id}>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:6}}>
+<div style={{fontSize:15,fontWeight:700}}>{m.name}</div>
+<div style={{fontSize:16,fontWeight:900,color:GOLD}}>{m.cal} קק״ל</div>
+</div>
+<div style={{fontSize:12,color:MUTED2,marginBottom:8}}>{m.items.join(” · “)}</div>
+<div style={{display:“flex”,gap:14,fontSize:11}}>
+<span style={{color:GREEN}}>ח׳ {m.p}g</span>
+<span style={{color:BLUE}}>פח׳ {m.c}g</span>
+<span style={{color:ORANGE}}>ש׳ {m.f}g</span>
+</div>
+</Card>)}
+</div>
+<div>
+<STitle>שתייה</STitle>
+<Card>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:8}}>
+<span style={{fontSize:14,fontWeight:600}}>💧 מים</span>
+<span style={{fontSize:20,fontWeight:900,color:BLUE}}>{water.toFixed(1)} / 2.5 ל׳</span>
+</div>
+<BarUI value={water} max={2.5} color={BLUE} h={10}/>
+<div style={{display:“flex”,gap:8,marginTop:12,justifyContent:“center”}}>
+{[{v:0.25,l:“250ml”},{v:0.33,l:“330ml”},{v:0.5,l:“500ml”}].map(b=>
+<button key={b.v} onClick={()=>setWater(w=>Math.min(2.5,+(w+b.v).toFixed(2)))} style={{background:”#141420”,border:“1px solid #2A2A4E”,borderRadius:10,padding:“8px 14px”,color:BLUE,fontSize:13,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,fontWeight:700}}>+{b.l}</button>
+)}
+</div>
+</Card>
+</div>
 
-    function STitle({ children }) {
-      return (
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 3, color: MUTED2,
-        textTransform: "uppercase", marginBottom: 12 }}>{children}</div>
-      );
-    }
+  </div>;
+}
 
-    function BarUI({ value, max, color, h = 7 }) {
-      const p = Math.min(100, Math.round((value / max) * 100));
-      return (
-        <div style={{ background: "#252528", borderRadius: 99, height: h, overflow: "hidden" }}>
-          <div style={{ width: `${p}%`, height: "100%", background: color, borderRadius: 99,
-          transition: "width 0.7s cubic-bezier(.4,0,.2,1)" }} />
-        </div>
-      );
-    }
+// ── PROGRESS ──
+function Progress(){
+const [newWeight,setNewWeight]=useState(””);
+const lastTrend=66.8, prevTrend=67.1;
+return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:18}}>
+<div>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>מעקב התקדמות</div>
+<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>גרפים ומדידות</div>
+</div>
+<Card style={{background:“linear-gradient(135deg,#0E1A0E,#0A120A)”,borderColor:”#1A2E1A”}}>
+<div style={{fontSize:10,color:GREEN,fontWeight:700,letterSpacing:1.5,marginBottom:8}}>● המשקל האמיתי שלך (EWMA)</div>
+<div style={{display:“flex”,alignItems:“baseline”,gap:10,marginBottom:4}}>
+<div style={{fontSize:48,fontWeight:900,lineHeight:1}}>{lastTrend}</div>
+<div style={{fontSize:20,color:MUTED2}}>ק״ג</div>
+<div style={{fontSize:14,color:GREEN,fontWeight:700}}>▼ {(prevTrend-lastTrend).toFixed(1)}</div>
+</div>
+<div style={{fontSize:12,color:MUTED2,marginBottom:12}}>שקילה אחרונה: <span style={{color:TEXT}}>{CUR_W} ק״ג</span> · פער: <span style={{color:GOLD}}>+{(CUR_W-lastTrend).toFixed(1)} ק״ג</span></div>
+<div style={{display:“flex”,gap:20}}>
+{[{l:“קצב שבועי”,v:`-${RATE} ק״ג`,c:GREEN},{l:“מהתחלה”,v:`-${(START_W-lastTrend).toFixed(1)} ק״ג`,c:GREEN},{l:“ליעד”,v:`${(lastTrend-GOAL_W).toFixed(1)} ק״ג`,c:GOLD}].map(s=>
+<div key={s.l}><div style={{fontSize:10,color:MUTED2,marginBottom:2}}>{s.l}</div><div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div></div>
+)}
+</div>
+</Card>
+<GoalETA/>
+<div>
+<STitle>גרף משקל · EWMA מול מדידות</STitle>
+<Card style={{padding:“14px 10px”}}>
+<ResponsiveContainer width="100%" height={190}>
+<AreaChart data={weightData} margin={{top:4,right:4,left:0,bottom:0}}>
+<defs>
+<linearGradient id="gG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="5%" stopColor={GREEN} stopOpacity={0.25}/>
+<stop offset="95%" stopColor={GREEN} stopOpacity={0}/>
+</linearGradient>
+</defs>
+<XAxis dataKey="date" tick={{fill:MUTED2,fontSize:9}} axisLine={false} tickLine={false}/>
+<YAxis domain={[64.5,70.5]} tick={{fill:MUTED2,fontSize:9}} axisLine={false} tickLine={false} width={28}/>
+<ReferenceLine y={GOAL_W} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1}/>
+<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:10,fontSize:11,direction:“rtl”}} formatter={(v,n)=>[`${v} ק״ג`,n===“trend”?“מגמה EWMA”:“נמדד”]}/>
+<Area type=“monotone” dataKey=“w” stroke={`${GOLD}77`} strokeWidth={1.5} fill=“none” dot={{fill:GOLD,r:3,strokeWidth:0}} name=“raw”/>
+<Area type="monotone" dataKey="trend" stroke={GREEN} strokeWidth={3} fill="url(#gG)" dot={false} name="trend"/>
+</AreaChart>
+</ResponsiveContainer>
+</Card>
+</div>
+<div>
+<STitle>מדידות גוף</STitle>
+<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}}>
+{[{l:“מותן”,c:“72 ס״מ”,d:“−3 ס״מ”,pos:true},{l:“ירכיים”,c:“94 ס״מ”,d:“−2 ס״מ”,pos:true},{l:“חזה”,c:“86 ס״מ”,d:“−1 ס״מ”,pos:true},{l:“זרוע”,c:“30 ס״מ”,d:”+1 ס״מ”,pos:false}].map(m=>
+<Card key={m.l} style={{padding:14}}>
+<div style={{fontSize:11,color:MUTED2,marginBottom:5}}>{m.l}</div>
+<div style={{fontSize:20,fontWeight:800}}>{m.c}</div>
+<div style={{fontSize:11,color:m.pos?GREEN:GOLD,fontWeight:600,marginTop:4}}>{m.d} מהתחלה</div>
+</Card>
+)}
+</div>
+</div>
+<Card style={{background:”#111009”,borderColor:”#252210”}}>
+<div style={{fontSize:12,fontWeight:700,color:GOLD,marginBottom:12}}>➕ הוספת שקילה</div>
+<div style={{display:“flex”,gap:10}}>
+<input type=“number” value={newWeight} placeholder=“66.3” onChange={e=>setNewWeight(e.target.value)} style={{flex:1,background:”#1A1A1E”,border:“1px solid #2A2A2E”,borderRadius:12,padding:“12px 14px”,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”}}/>
+<button onClick={()=>setNewWeight(””)} style={{background:GOLD,color:”#000”,border:“none”,borderRadius:12,padding:“12px 20px”,fontWeight:900,fontSize:15,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”}}>שמור</button>
+</div>
+<div style={{fontSize:11,color:MUTED,marginTop:8}}>* שקול בוקר, בצום, אחרי שירותים – לדיוק מרבי</div>
+</Card>
 
-    function Ring({ p, color, size = 104, stroke = 10, children }) {
-      const r = (size - stroke) / 2;
-      const circ = 2 * Math.PI * r;
-      const dash = (Math.min(100, p) / 100) * circ;
-      return (
-        <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
-          <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-            <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#252528" strokeWidth={stroke} />
-            <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-            strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-            style={{ transition: "stroke-dasharray 0.7s cubic-bezier(.4,0,.2,1)" }} />
-          </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center" }}>{children}</div>
-        </div>
-      );
-    }
+  </div>;
+}
 
-    function EnergyBalanceBar({ intake, tdee }) {
-      const diff = intake - tdee;
-      const isDeficit = diff < 0;
-      const barPct = Math.min(48, (Math.abs(diff) / tdee) * 100 * 3);
-      return (
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: MUTED2, marginBottom: 8 }}>
-            <span>עודף</span>
-            <span style={{ fontWeight: 700, color: TEXT, fontSize: 12 }}>
-              {isDeficit ? "גירעון" : "עודף"}: <span style={{ color: isDeficit ? GREEN : ORANGE }}>{Math.abs(diff)} קק״ל</span>
-            </span>
-            <span>גירעון</span>
-          </div>
-          <div style={{ position: "relative", height: 12, background: "#1E1E22", borderRadius: 99 }}>
-            <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 2,
-            background: "#333", transform: "translateX(-50%)" }} />
-            <div style={{
-              position: "absolute", top: 2, bottom: 2, borderRadius: 99,
-              background: isDeficit ? GREEN : ORANGE,
-              width: `${barPct}%`,
-              right: isDeficit ? "50%" : undefined,
-              left: isDeficit ? undefined : "50%",
-              transition: "width 0.8s ease"
-            }} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: MUTED, marginTop: 5 }}>
-            <span>↑ +500</span>
-            <span>TDEE: {tdee} קק״ל</span>
-            <span>↓ -500</span>
-          </div>
-        </div>
-      );
-    }
+// ── ANALYTICS ──
+function Analytics(){
+const months=[{m:“מרץ”,cal:1620},{m:“אפריל”,cal:1550},{m:“מאי”,cal:avgCal}];
+return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:18}}>
+<div>
+<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>ניתוח מעמיק</div>
+<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>Analytics 📊</div>
+</div>
+<Card style={{background:“linear-gradient(135deg,#101018,#0E0E16)”,borderColor:”#22223A”}}>
+<div style={{fontSize:10,color:BLUE,fontWeight:700,letterSpacing:1,marginBottom:8}}>TDEE · הוצאה אנרגטית יומית</div>
+<div style={{display:“flex”,gap:20,marginBottom:14}}>
+<div><div style={{fontSize:36,fontWeight:900}}>{TDEE}</div><div style={{fontSize:11,color:MUTED2}}>קק״ל/יום</div></div>
+<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:5,justifyContent:“center”}}>
+<div style={{fontSize:12,color:MUTED2}}>ממוצע: <span style={{color:TEXT,fontWeight:700}}>{avgCal}</span></div>
+<div style={{fontSize:12,color:MUTED2}}>גירעון: <span style={{color:GREEN,fontWeight:700}}>-{dailyDef} קק״ל</span></div>
+<div style={{fontSize:12,color:MUTED2}}>קצב: <span style={{color:GREEN,fontWeight:700}}>-{RATE} ק״ג/שבוע</span></div>
+</div>
+</div>
+<div style={{background:”#1A1A2A”,borderRadius:10,padding:10,fontSize:10,color:MUTED2,lineHeight:1.6}}>
+🧮 <strong style={{color:TEXT}}>חישוב:</strong> {avgCal} + {dailyDef} = <strong style={{color:GOLD}}>{TDEE} קק״ל</strong>
+<br/>מחושב מצריכה + שינוי משקל בפועל, לא מ-BMR גנרי
+</div>
+</Card>
+<div>
+<STitle>מאזן אנרגטי שבועי</STitle>
+<Card style={{padding:“14px 10px”}}>
+<ResponsiveContainer width="100%" height={110}>
+<BarChart data={weeklyLog} margin={{top:4,right:4,left:0,bottom:0}}>
+<XAxis dataKey="day" tick={{fill:MUTED2,fontSize:10}} axisLine={false} tickLine={false}/>
+<YAxis hide/>
+<ReferenceLine y={TDEE} stroke={BLUE} strokeDasharray="4 4" strokeWidth={1.5}/>
+<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:8,fontSize:11}} formatter={(v)=>v?[`${v>TDEE?"+":""}${v-TDEE} קק״ל`,“מאזן”]:[” לא נרשם”,””]}/>
+<Bar dataKey="cal" radius={[4,4,0,0]}>
+{weeklyLog.map((d,i)=><Cell key={i} fill={!d.ok?”#252528”:d.cal<=TDEE?GREEN:ORANGE}/>)}
+</Bar>
+</BarChart>
+</ResponsiveContainer>
+<div style={{fontSize:9,color:MUTED2,textAlign:“center”,marginTop:4}}>
+- - TDEE {TDEE} · <span style={{color:GREEN}}>■ גירעון</span> · <span style={{color:ORANGE}}>■ עודף</span>
+</div>
+</Card>
+</div>
+<div>
+<STitle>ממוצע קלוריות לפי חודש</STitle>
+<Card>
+{months.map(m=><div key={m.m} style={{marginBottom:12}}>
+<div style={{display:“flex”,justifyContent:“space-between”,fontSize:12,marginBottom:5}}>
+<span style={{fontWeight:700}}>{m.m}</span>
+<span style={{color:Math.abs(m.cal-TARGET_CAL)<100?GREEN:GOLD}}>{m.cal} <span style={{color:MUTED2,fontWeight:400}}>קק״ל</span></span>
+</div>
+<BarUI value={m.cal} max={2200} color={Math.abs(m.cal-TARGET_CAL)<100?GREEN:GOLD} h={8}/>
+</div>)}
+</Card>
+</div>
+<div>
+<STitle>עמידה במעקב</STitle>
+<Card>
+<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“flex-start”,marginBottom:14}}>
+<div>
+<div style={{fontSize:36,fontWeight:900,color:adh>=80?GREEN:ORANGE}}>{adh}%</div>
+<div style={{fontSize:12,color:MUTED2}}>{loggedDays.length}/7 ימים</div>
+</div>
+<div style={{fontSize:11,color:MUTED2,maxWidth:160,lineHeight:1.6,textAlign:“right”}}>המערכת מסתגלת לפי מה שנרשם בפועל, כמו MacroFactor 🎯</div>
+</div>
+<div style={{display:“flex”,gap:4,justifyContent:“center”,alignItems:“flex-end”}}>
+{weeklyLog.map((d,i)=>
+<div key={i} style={{display:“flex”,flexDirection:“column”,alignItems:“center”,gap:3}}>
+<div style={{width:28,height:Math.max(8,d.ok?Math.round((d.cal/2000)*55):8),background:d.ok?GREEN:”#252528”,borderRadius:3}}/>
+<div style={{fontSize:9,color:MUTED2}}>{d.day}</div>
+</div>
+)}
+</div>
+</Card>
+</div>
+<div>
+<STitle>עמידה ביעדי מאקרו</STitle>
+<Card>
+{[{l:“חלבון”,avg:88,t:130,col:GREEN},{l:“פחמימות”,avg:145,t:175,col:BLUE},{l:“שומן”,avg:48,t:58,col:ORANGE}].map(m=>
+<div key={m.l} style={{marginBottom:12}}>
+<div style={{display:“flex”,justifyContent:“space-between”,fontSize:12,marginBottom:5}}>
+<span style={{color:MUTED2}}>{m.l}</span>
+<span style={{fontWeight:700}}>{m.avg}g<span style={{color:MUTED,fontWeight:400}}> / {m.t}g</span>
+<span style={{color:m.avg>=m.t*0.9?GREEN:ORANGE,marginRight:5,fontWeight:700}}> {Math.round((m.avg/m.t)*100)}%</span></span>
+</div>
+<BarUI value={m.avg} max={m.t} color={m.col} h={8}/>
+</div>
+)}
+</Card>
+</div>
 
-    function GoalETA({ style = {} }) {
-      const progressToGoal = ((START_WEIGHT - CURRENT_WEIGHT) / (START_WEIGHT - GOAL_WEIGHT)) * 100;
-      return (
-        <Card style={{ background: "linear-gradient(135deg,#111A0E,#0C120A)", borderColor: "#1E3018", ...style }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-            <div>
-              <div style={{ fontSize: 10, color: GREEN, fontWeight: 700, letterSpacing: 1, marginBottom: 3 }}>ETA ליעד</div>
-              <div style={{ fontSize: 28, fontWeight: 900 }}>
-                {weeksToGoal} <span style={{ fontSize: 14, fontWeight: 400, color: MUTED2 }}>שבועות</span>
-              </div>
-              <div style={{ fontSize: 11, color: MUTED2, marginTop: 2 }}>{CURRENT_WEIGHT} → {GOAL_WEIGHT} ק״ג</div>
-            </div>
-            <Ring p={progressToGoal} color={GREEN} size={72} stroke={7}>
-              <div style={{ fontSize: 13, fontWeight: 900, color: GREEN }}>{Math.round(progressToGoal)}%</div>
-            </Ring>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: MUTED2, marginBottom: 6 }}>
-              <span>התחלה {START_WEIGHT}</span>
-              <span style={{ color: GOLD }}>● {CURRENT_WEIGHT} ק״ג</span>
-              <span>יעד {GOAL_WEIGHT}</span>
-            </div>
-            <div style={{ position: "relative", background: "#1E2A1E", borderRadius: 99, height: 8 }}>
-              <div style={{ width: `${progressToGoal}%`, height: "100%",
-              background: `linear-gradient(90deg,${GREEN}88,${GREEN})`, borderRadius: 99, position: "relative" }}>
-                <div style={{ position: "absolute", left: "100%", top: "50%",
-                transform: "translate(-50%,-50%)", width: 14, height: 14,
-                background: GOLD, borderRadius: "50%", border: "2px solid #0C120A",
-                boxShadow: `0 0 8px ${GOLD}88` }} />
-              </div>
-            </div>
-          </div>
-          <div style={{ fontSize: 11, color: MUTED2, marginTop: 8 }}>
-            קצב: <span style={{ color: GREEN, fontWeight: 700 }}>-{RATE_PER_WEEK} ק״ג/שבוע</span> · על פי מגמת EWMA
-          </div>
-        </Card>
-      );
-    }
+  </div>;
+}
 
-    // ── DASHBOARD ──────────────────────────────────────────────────────────────
-    function Dashboard({ setTab }) {
-      const hour = new Date().getHours();
-      const greeting = hour < 12 ? "בוקר טוב" : hour < 17 ? "צהריים טובים" : "ערב טוב";
-      const totCal = MEALS.reduce((a, m) => a + m.cal, 0);
-      const totP = MEALS.reduce((a, m) => a + m.p, 0);
-      const totC = MEALS.reduce((a, m) => a + m.c, 0);
-      const totF = MEALS.reduce((a, m) => a + m.f, 0);
+// ── APP ──
+const TABS=[
+{id:“dashboard”,icon:“⌂”,label:“בית”},
+{id:“workout”,icon:“💪”,label:“אימון”},
+{id:“nutrition”,icon:“🍽”,label:“תזונה”},
+{id:“progress”,icon:“📈”,label:“מעקב”},
+{id:“analytics”,icon:“🧠”,label:“ניתוח”},
+];
 
-      return (
-        <div style={{ padding: "22px 16px 0", display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 12, color: MUTED2, marginBottom: 3 }}>{todayStr()}</div>
-            <div style={{ fontSize: 30, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900, lineHeight: 1.15 }}>
-              {greeting},<br /><span style={{ color: GOLD }}>תמר</span> ✨
-            </div>
-          </div>
+export default function App(){
+const [tab,setTab]=useState(“dashboard”);
+return <div style={{background:BG,minHeight:“100vh”,color:TEXT,fontFamily:”‘Heebo’,sans-serif”,direction:“rtl”,maxWidth:440,margin:“0 auto”,paddingBottom:84}}>
+<div style={{background:”#0E0E11”,padding:“14px 20px 12px”,borderBottom:“1px solid #1A1A1E”,position:“sticky”,top:0,zIndex:50,display:“flex”,alignItems:“center”,justifyContent:“space-between”}}>
+<div>
+<div style={{fontSize:9,color:MUTED,letterSpacing:2.5,textTransform:“uppercase”,marginBottom:2}}>COACHED BY DAN Z</div>
+<div style={{fontSize:20,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>תמר ס׳ <span style={{color:GOLD}}>✦</span></div>
+</div>
+<div style={{width:42,height:42,borderRadius:“50%”,background:`linear-gradient(135deg,${GOLD},${GOLD_DIM})`,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:18,fontWeight:900,color:”#000”}}>ת</div>
+</div>
+{tab===“dashboard”&&<Dashboard setTab={setTab}/>}
+{tab===“workout”&&<Workout/>}
+{tab===“nutrition”&&<Nutrition/>}
+{tab===“progress”&&<Progress/>}
+{tab===“analytics”&&<Analytics/>}
+<div style={{position:“fixed”,bottom:0,left:“50%”,transform:“translateX(-50%)”,width:“100%”,maxWidth:440,background:”#0A0A0D”,borderTop:“1px solid #1A1A1E”,display:“flex”,paddingBottom:16,paddingTop:8,zIndex:100}}>
+{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,background:“none”,border:“none”,cursor:“pointer”,display:“flex”,flexDirection:“column”,alignItems:“center”,gap:3,color:tab===t.id?GOLD:MUTED,transition:“color 0.2s”,padding:“4px 0”,fontFamily:”‘Heebo’,sans-serif”}}>
+<span style={{fontSize:22,lineHeight:1}}>{t.icon}</span>
+<span style={{fontSize:10,fontWeight:tab===t.id?800:400}}>{t.label}</span>
+</button>)}
+</div>
 
-          <Card style={{ background: "linear-gradient(135deg,#1A1A0E,#141409)", borderColor: "#2A2A10" }}>
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
-                background: `linear-gradient(135deg,${GOLD},${GOLD_DIM})`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 800, fontSize: 16, color: "#000" }}>ד</div>
-              <div>
-                <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 5 }}>דן מ׳ · עכשיו</div>
-                <div style={{ fontSize: 13.5, lineHeight: 1.65, color: TEXT }}>
-                  תמר 🌟 על פי ה-EWMA את בקצב של -{RATE_PER_WEEK} ק״ג/שבוע. עוד {weeksToGoal} שבועות ליעד! יאללה 💪
-                </div>
-              </div>
-            </div>
-          </Card>
+  </div>;
+}
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {[
-              { label: "אימונים", val: "3/4", sub: "השבוע", col: GOLD },
-              { label: "רצף", val: "12", sub: "ימים 🔥", col: "#E07030" },
-              { label: "מעקב", val: `${adherencePct}%`, sub: "השבוע", col: BLUE },
-            ].map(s => (
-              <Card key={s.label} style={{ padding: "14px 10px", textAlign: "center" }}>
-                <div style={{ fontSize: 22, fontWeight: 900, color: s.col }}>{s.val}</div>
-                <div style={{ fontSize: 11, color: MUTED2, marginTop: 2 }}>{s.label}</div>
-                <div style={{ fontSize: 10, color: MUTED, marginTop: 1 }}>{s.sub}</div>
-              </Card>
-            ))}
-          </div>
+ReactDOM.createRoot(document.getElementById(‘root’)).render(<App/>);
+</script>
 
-          <Card style={{ background: "#111114", borderColor: "#222226" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div>
-                <div style={{ fontSize: 10, color: MUTED2, fontWeight: 700, letterSpacing: 1, marginBottom: 3 }}>TDEE · הוצאה יומית</div>
-                <div style={{ fontSize: 24, fontWeight: 900 }}>{estimatedTDEE} <span style={{ fontSize: 13, color: MUTED2, fontWeight: 400 }}>קק״ל</span></div>
-              </div>
-              <div style={{ textAlign: "center", background: "#1A1A1E", padding: "8px 14px", borderRadius: 12 }}>
-                <div style={{ fontSize: 11, color: MUTED2, marginBottom: 2 }}>ממוצע שבועי</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: GOLD }}>{avgCalories}</div>
-                <div style={{ fontSize: 10, color: MUTED2 }}>קק״ל/יום</div>
-              </div>
-            </div>
-            <EnergyBalanceBar intake={totCal} tdee={estimatedTDEE} />
-          </Card>
-
-          <GoalETA />
-
-          <Card onClick={() => setTab("workout")} style={{ background: "linear-gradient(135deg,#1C1808,#111008)", borderColor: "#2A2408" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 5 }}>אימון היום</div>
-                <div style={{ fontSize: 19, fontWeight: 800 }}>כוח עילי A 💪</div>
-                <div style={{ fontSize: 12, color: MUTED2, marginTop: 4 }}>5 תרגילים · ~55 דק׳</div>
-              </div>
-              <div style={{ background: GOLD, color: "#000", borderRadius: 12, padding: "10px 18px", fontWeight: 900, fontSize: 14 }}>
-                ← פתח
-              </div>
-            </div>
-          </Card>
-
-          <div>
-            <STitle>תזונה היום</STitle>
-            <Card>
-              <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                <Ring p={Math.min(100, Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={100} stroke={9}>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 19, fontWeight: 900, color: GOLD }}>{totCal}</div>
-                    <div style={{ fontSize: 9, color: MUTED2 }}>/ {TARGET_CAL}</div>
-                    <div style={{ fontSize: 9, color: GREEN, fontWeight: 600, marginTop: 1 }}>{TARGET_CAL - totCal} נותרו</div>
-                  </div>
-                </Ring>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
-                  {[
-                    { label: "חלבון", c: totP, t: 130, col: GREEN },
-                    { label: "פחמימות", c: totC, t: 175, col: BLUE },
-                    { label: "שומן", c: totF, t: 58, col: ORANGE },
-                  ].map(m => (
-                    <div key={m.label}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}>
-                        <span style={{ color: MUTED2 }}>{m.label}</span>
-                        <span style={{ fontWeight: 700 }}>{m.c}<span style={{ color: MUTED, fontWeight: 400 }}>/{m.t}g</span></span>
-                      </div>
-                      <BarUI value={m.c} max={m.t} color={m.col} h={6} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      );
-    }
-
-    // ── WORKOUT ────────────────────────────────────────────────────────────────
-    function Workout() {
-      const [exs, setExs] = useState(INIT_EXERCISES);
-      const [sel, setSel] = useState(null);
-      const [iReps, setIReps] = useState("");
-      const [iWeight, setIWeight] = useState("");
-      const [timerSec, setTimerSec] = useState(null);
-      const [timerTotal, setTimerTotal] = useState(90);
-      const intervalRef = useRef(null);
-
-      const startTimer = (secs) => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        setTimerTotal(secs); setTimerSec(secs);
-        intervalRef.current = setInterval(() => {
-          setTimerSec(prev => {
-            if (prev <= 1) { clearInterval(intervalRef.current); return null; }
-            return prev - 1;
-          });
-        }, 1000);
-      };
-      useEffect(() => () => clearInterval(intervalRef.current), []);
-
-      const logSet = (ex) => {
-        const reps = parseInt(iReps) || ex.reps;
-        const weight = iWeight !== "" ? parseFloat(iWeight) : ex.targetWeight;
-        setExs(prev => prev.map(e => e.id === ex.id ? { ...e, logged: [...e.logged, { reps, weight }] } : e));
-        setIReps(""); setIWeight("");
-        startTimer(90);
-      };
-
-      const done = exs.filter(e => e.logged.length >= e.sets).length;
-
-      return (
-        <div style={{ padding: "22px 16px 0" }}>
-          <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>אימון היום</div>
-            <div style={{ fontSize: 26, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900 }}>כוח עילי A</div>
-            <div style={{ fontSize: 12, color: MUTED2, marginTop: 4 }}>{done}/{exs.length} תרגילים</div>
-            <div style={{ marginTop: 10 }}><BarUI value={done} max={exs.length} color={GOLD} h={5} /></div>
-          </div>
-
-          {timerSec !== null && (
-            <Card style={{ background: "#1A1408", borderColor: "#2E2510", marginBottom: 16, padding: "12px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontSize: 12, color: MUTED2 }}>⏱ מנוחה</div>
-                <div style={{ fontSize: 30, fontWeight: 900, color: GOLD, fontVariantNumeric: "tabular-nums" }}>
-                  {String(Math.floor(timerSec/60)).padStart(2,"0")}:{String(timerSec%60).padStart(2,"0")}
-                </div>
-                <button onClick={() => { clearInterval(intervalRef.current); setTimerSec(null); }}
-                  style={{ background: "#2A2A2E", border: "none", color: TEXT, borderRadius: 8,
-                    padding: "6px 12px", cursor: "pointer", fontFamily: "'Heebo'", fontSize: 12 }}>דלג</button>
-              </div>
-              <div style={{ marginTop: 8 }}><BarUI value={timerTotal - timerSec} max={timerTotal} color={GOLD} h={4} /></div>
-            </Card>
-          )}
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {exs.map(ex => {
-              const isDone = ex.logged.length >= ex.sets;
-              const isOpen = sel === ex.id;
-              return (
-                <Card key={ex.id} onClick={() => !isDone && setSel(isOpen ? null : ex.id)}
-                  style={{ borderColor: isDone ? "#2A442A" : isOpen ? "#2A2614" : "#1E1E22",
-                    background: isDone ? "#101A10" : isOpen ? "#1A1A0E" : CARD }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                      background: isDone ? GREEN : "#252528",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 12, fontWeight: 700, color: isDone ? "#fff" : MUTED2 }}>
-                      {isDone ? "✓" : ex.logged.length}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 15, fontWeight: 700 }}>{ex.name}</span>
-                        {ex.pr && (
-                          <span style={{ fontSize: 9, background: "#2A1A06", color: GOLD,
-                            padding: "2px 7px", borderRadius: 99, fontWeight: 700 }}>
-                            שיא {ex.pr}{ex.bw ? " חז'" : " ק״ג"}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: 12, color: MUTED2, marginTop: 3 }}>
-                        {ex.sets} × {ex.reps} חז'{!ex.bw && ` · יעד: ${ex.targetWeight} ק״ג`}
-                      </div>
-                    </div>
-                    {!isDone && (
-                      <div style={{ fontSize: 16, color: isOpen ? GOLD : MUTED,
-                        transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>⌄</div>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", gap: 6, marginTop: 10, marginRight: 38 }}>
-                    {Array.from({ length: ex.sets }).map((_, i) => (
-                      <div key={i} style={{ width: 36, height: 36, borderRadius: 10,
-                        background: i < ex.logged.length ? GREEN : "#252528",
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                        fontSize: 10, fontWeight: 700, color: i < ex.logged.length ? "#fff" : MUTED,
-                        transition: "background 0.3s" }}>
-                        {i < ex.logged.length ? (
-                          <React.Fragment>
-                            <span>{ex.logged[i].reps}</span>
-                            {!ex.bw && <span style={{ fontSize: 8, fontWeight: 400, color: "#9fd09f" }}>{ex.logged[i].weight}k</span>}
-                          </React.Fragment>
-                        ) : <span style={{ fontSize: 11 }}>{i+1}</span>}
-                      </div>
-                    ))}
-                  </div>
-
-                  {isOpen && !isDone && (
-                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #2A2A2E",
-                      display: "flex", gap: 10, alignItems: "flex-end" }}
-                      onClick={e => e.stopPropagation()}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 10, color: MUTED2, marginBottom: 5 }}>חזרות</div>
-                        <input type="number" value={iReps} placeholder={ex.reps} onChange={e => setIReps(e.target.value)}
-                          style={{ width: "100%", background: "#252528", border: "1px solid #333", borderRadius: 10,
-                            padding: 10, color: TEXT, fontSize: 18, fontFamily: "'Heebo'", textAlign: "center" }} />
-                      </div>
-                      {!ex.bw && (
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 10, color: MUTED2, marginBottom: 5 }}>ק״ג</div>
-                          <input type="number" value={iWeight} placeholder={ex.targetWeight} onChange={e => setIWeight(e.target.value)}
-                            style={{ width: "100%", background: "#252528", border: "1px solid #333", borderRadius: 10,
-                              padding: 10, color: TEXT, fontSize: 18, fontFamily: "'Heebo'", textAlign: "center" }} />
-                        </div>
-                      )}
-                      <button onClick={() => logSet(ex)} style={{ background: GOLD, color: "#000", border: "none",
-                        borderRadius: 12, padding: "12px 18px", fontWeight: 900, fontSize: 14,
-                        cursor: "pointer", fontFamily: "'Heebo'", flexShrink: 0 }}>
-                        סט {ex.logged.length+1} ✓
-                      </button>
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
-
-          {done === exs.length && (
-            <Card style={{ marginTop: 20, background: "linear-gradient(135deg,#162016,#0E160E)",
-              borderColor: "#2A442A", textAlign: "center", padding: "28px 20px" }}>
-              <div style={{ fontSize: 44, marginBottom: 10 }}>🎉</div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: GREEN, fontFamily: "'Frank Ruhl Libre'" }}>האימון הושלם!</div>
-              <div style={{ fontSize: 14, color: MUTED2, marginTop: 6 }}>כל הכבוד תמר! רצף 🔥</div>
-            </Card>
-          )}
-
-          <div style={{ marginTop: 24, marginBottom: 8 }}>
-            <STitle>שיאים אישיים 🏆</STitle>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {PRS_DATA.map((pr, i) => {
-                const cur = pr.w || pr.reps;
-                const improve = pr.w ? pr.w - pr.prev : pr.reps - pr.prev;
-                const medals = ["🥇","🥈","🥉","🏅","🏅"];
-                return (
-                  <Card key={pr.exercise} style={{ padding: "12px 14px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 20 }}>{medals[i]}</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700 }}>{pr.exercise}</div>
-                        <div style={{ fontSize: 11, color: MUTED2 }}>{pr.date} · +{improve} {pr.unit}</div>
-                      </div>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: GOLD }}>{cur} <span style={{ fontSize: 11, color: MUTED2 }}>{pr.unit}</span></div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // ── NUTRITION ──────────────────────────────────────────────────────────────
-    function Nutrition() {
-      const totCal = MEALS.reduce((a, m) => a + m.cal, 0);
-      const totP = MEALS.reduce((a, m) => a + m.p, 0);
-      const totC = MEALS.reduce((a, m) => a + m.c, 0);
-      const totF = MEALS.reduce((a, m) => a + m.f, 0);
-      const [water, setWater] = useState(1.8);
-
-      return (
-        <div style={{ padding: "22px 16px 0", display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 3 }}>יומן תזונה</div>
-            <div style={{ fontSize: 26, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900 }}>{todayStr()}</div>
-          </div>
-
-          <Card>
-            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-              <Ring p={Math.min(100,Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={112} stroke={10}>
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 21, fontWeight: 900, color: GOLD }}>{totCal}</div>
-                  <div style={{ fontSize: 9, color: MUTED2 }}>/ {TARGET_CAL} קק״ל</div>
-                  <div style={{ fontSize: 10, color: GREEN, fontWeight: 700, marginTop: 2 }}>{TARGET_CAL - totCal} נותרו</div>
-                </div>
-              </Ring>
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
-                {[
-                  { label: "🥩 חלבון", c: totP, t: 130, col: GREEN },
-                  { label: "🌾 פחמימות", c: totC, t: 175, col: BLUE },
-                  { label: "🫒 שומן", c: totF, t: 58, col: ORANGE },
-                ].map(m => (
-                  <div key={m.label}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}>
-                      <span style={{ color: MUTED2 }}>{m.label}</span>
-                      <span style={{ fontWeight: 700 }}>{m.c}<span style={{ color: MUTED, fontWeight: 400 }}>/{m.t}g</span></span>
-                    </div>
-                    <BarUI value={m.c} max={m.t} color={m.col} h={7} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <Card style={{ textAlign: "center", padding: "14px 10px" }}>
-              <div style={{ fontSize: 10, color: MUTED2, marginBottom: 4 }}>ממוצע שבועי</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: GOLD }}>{avgCalories}</div>
-              <div style={{ fontSize: 10, color: MUTED2 }}>קק״ל/יום</div>
-              <div style={{ fontSize: 10, color: MUTED, marginTop: 4 }}>יעד: {TARGET_CAL}</div>
-            </Card>
-            <Card style={{ textAlign: "center", padding: "14px 10px" }}>
-              <div style={{ fontSize: 10, color: MUTED2, marginBottom: 4 }}>עמידה במעקב</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: adherencePct >= 80 ? GREEN : ORANGE }}>{adherencePct}%</div>
-              <div style={{ fontSize: 10, color: MUTED2 }}>{adherenceDays}/7 ימים</div>
-              <div style={{ marginTop: 6, display: "flex", gap: 3, justifyContent: "center" }}>
-                {weeklyLog.map((d, i) => (
-                  <div key={i} style={{ width: 10, height: 10, borderRadius: 3, background: d.logged ? GREEN : "#252528" }} />
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          <Card style={{ padding: "14px 10px" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10, paddingRight: 4 }}>קלוריות לפי יום</div>
-            <ResponsiveContainer width="100%" height={100}>
-              <BarChart data={weeklyLog} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                <XAxis dataKey="day" tick={{ fill: MUTED2, fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis hide domain={[0, 2200]} />
-                <ReferenceLine y={TARGET_CAL} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1.5} />
-                <Tooltip contentStyle={{ background: CARD2, border: "1px solid #2A2A2E", borderRadius: 8, fontSize: 11 }}
-                  formatter={(v) => v ? [`${v} קק״ל`, ""] : ["לא נרשם", ""]} />
-                <Bar dataKey="cal" radius={[6,6,0,0]}>
-                  {weeklyLog.map((d, i) => (
-                    <Cell key={i} fill={!d.logged ? "#252528" : Math.abs(d.cal - TARGET_CAL) < 150 ? GREEN : GOLD} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <div style={{ fontSize: 10, color: MUTED2, textAlign: "center", marginTop: 4 }}>
-              - - יעד {TARGET_CAL} קק״ל
-            </div>
-          </Card>
-
-          <STitle>ארוחות</STitle>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {MEALS.map(meal => (
-              <Card key={meal.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700 }}>{meal.name}</div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: GOLD }}>{meal.cal} קק״ל</div>
-                </div>
-                <div style={{ fontSize: 12, color: MUTED2, marginBottom: 8 }}>{meal.items.join(" · ")}</div>
-                <div style={{ display: "flex", gap: 14, fontSize: 11 }}>
-                  <span style={{ color: GREEN }}>ח׳ {meal.p}g</span>
-                  <span style={{ color: BLUE }}>פח׳ {meal.c}g</span>
-                  <span style={{ color: ORANGE }}>ש׳ {meal.f}g</span>
-                </div>
-              </Card>
-            ))}
-            <button style={{ background: "transparent", border: "1px dashed #2A2A2E", borderRadius: 18,
-              padding: 16, color: MUTED2, fontSize: 14, cursor: "pointer", fontFamily: "'Heebo'", width: "100%" }}>
-              + הוסף ארוחה
-            </button>
-          </div>
-
-          <div>
-            <STitle>שתייה</STitle>
-            <Card>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 600 }}>💧 מים</span>
-                <span style={{ fontSize: 20, fontWeight: 900, color: BLUE }}>{water.toFixed(1)} / 2.5 ל׳</span>
-              </div>
-              <BarUI value={water} max={2.5} color={BLUE} h={10} />
-              <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "center" }}>
-                {[0.25, 0.33, 0.5].map(v => (
-                  <button key={v} onClick={() => setWater(w => Math.min(2.5, +(w + v).toFixed(2)))}
-                    style={{ background: "#141420", border: "1px solid #2A2A4E", borderRadius: 10,
-                      padding: "8px 14px", color: BLUE, fontSize: 13, cursor: "pointer",
-                      fontFamily: "'Heebo'", fontWeight: 700 }}>
-                    +{v === 0.25 ? "250" : v === 0.33 ? "330" : "500"}ml
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </div>
-      );
-    }
-
-    // ── PROGRESS ───────────────────────────────────────────────────────────────
-    function Progress() {
-      const [newWeight, setNewWeight] = useState("");
-      const lastTrend = weightData[weightData.length - 1].trend;
-      const prevTrend = weightData[weightData.length - 2].trend;
-
-      return (
-        <div style={{ padding: "22px 16px 0", display: "flex", flexDirection: "column", gap: 18 }}>
-          <div>
-            <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 3 }}>מעקב התקדמות</div>
-            <div style={{ fontSize: 26, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900 }}>גרפים ומדידות</div>
-          </div>
-
-          <Card style={{ background: "linear-gradient(135deg,#0E1A0E,#0A120A)", borderColor: "#1A2E1A" }}>
-            <div style={{ fontSize: 10, color: GREEN, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>
-              ● המשקל האמיתי שלך (EWMA)
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 4 }}>
-              <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1 }}>{lastTrend}</div>
-              <div style={{ fontSize: 20, color: MUTED2 }}>ק״ג</div>
-              <div style={{ fontSize: 14, color: GREEN, fontWeight: 700 }}>▼ {(prevTrend - lastTrend).toFixed(1)}</div>
-            </div>
-            <div style={{ fontSize: 12, color: MUTED2, marginBottom: 12 }}>
-              שקילה אחרונה: <span style={{ color: TEXT }}>{CURRENT_WEIGHT} ק״ג</span>
-              {" "}· פער מגמה: <span style={{ color: GOLD }}>+{(CURRENT_WEIGHT - lastTrend).toFixed(1)} ק״ג</span>
-            </div>
-            <div style={{ display: "flex", gap: 20 }}>
-              {[
-                { label: "קצב שבועי", val: `-${RATE_PER_WEEK} ק״ג`, col: GREEN },
-                { label: "מהתחלה",    val: `-${(START_WEIGHT - lastTrend).toFixed(1)} ק״ג`, col: GREEN },
-                { label: "ליעד",     val: `${(lastTrend - GOAL_WEIGHT).toFixed(1)} ק״ג`,   col: GOLD },
-              ].map(s => (
-                <div key={s.label}>
-                  <div style={{ fontSize: 10, color: MUTED2, marginBottom: 2 }}>{s.label}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: s.col }}>{s.val}</div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <GoalETA />
-
-          <div>
-            <STitle>גרף משקל · EWMA מול מדידות</STitle>
-            <Card style={{ padding: "14px 10px" }}>
-              <ResponsiveContainer width="100%" height={190}>
-                <AreaChart data={weightData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gGreen2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={GREEN} stopOpacity={0.25} />
-                      <stop offset="95%" stopColor={GREEN} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" tick={{ fill: MUTED2, fontSize: 9 }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[64.5, 70.5]} tick={{ fill: MUTED2, fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
-                  <ReferenceLine y={GOAL_WEIGHT} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1} />
-                  <Tooltip contentStyle={{ background: CARD2, border: "1px solid #2A2A2E", borderRadius: 10, fontSize: 11, direction: "rtl" }}
-                    formatter={(v, n) => [`${v} ק״ג`, n === "trend" ? "מגמה EWMA" : "נמדד"]} />
-                  <Area type="monotone" dataKey="w" stroke={`${GOLD}77`} strokeWidth={1.5} fill="none"
-                    dot={{ fill: GOLD, r: 3, strokeWidth: 0 }} name="raw" />
-                  <Area type="monotone" dataKey="trend" stroke={GREEN} strokeWidth={3} fill="url(#gGreen2)" dot={false} name="trend" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </Card>
-          </div>
-
-          <div>
-            <STitle>מדידות גוף</STitle>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {[
-                { label: "מותן",  cur: "72 ס״מ", chg: "−3 ס״מ", pos: true },
-                { label: "ירכיים", cur: "94 ס״מ", chg: "−2 ס״מ", pos: true },
-                { label: "חזה",   cur: "86 ס״מ", chg: "−1 ס״מ", pos: true },
-                { label: "זרוע",  cur: "30 ס״מ", chg: "+1 ס״מ", pos: false },
-              ].map(m => (
-                <Card key={m.label} style={{ padding: 14 }}>
-                  <div style={{ fontSize: 11, color: MUTED2, marginBottom: 5 }}>{m.label}</div>
-                  <div style={{ fontSize: 20, fontWeight: 800 }}>{m.cur}</div>
-                  <div style={{ fontSize: 11, color: m.pos ? GREEN : GOLD, fontWeight: 600, marginTop: 4 }}>{m.chg} מהתחלה</div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <Card style={{ background: "#111009", borderColor: "#252210" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: GOLD, marginBottom: 12 }}>➕ הוספת שקילה</div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <input type="number" value={newWeight} placeholder="66.3" onChange={e => setNewWeight(e.target.value)}
-                style={{ flex: 1, background: "#1A1A1E", border: "1px solid #2A2A2E", borderRadius: 12,
-                  padding: "12px 14px", color: TEXT, fontSize: 18, fontFamily: "'Heebo'" }} />
-              <button onClick={() => setNewWeight("")} style={{ background: GOLD, color: "#000", border: "none",
-                borderRadius: 12, padding: "12px 20px", fontWeight: 900, fontSize: 15, cursor: "pointer", fontFamily: "'Heebo'" }}>
-                שמור
-              </button>
-            </div>
-            <div style={{ fontSize: 11, color: MUTED, marginTop: 8 }}>* שקול בוקר, בצום, אחרי שירותים – לדיוק מרבי</div>
-          </Card>
-        </div>
-      );
-    }
-
-    // ── ANALYTICS ──────────────────────────────────────
-    function Analytics() {
-      const monthlyAvg = [
-        { month: "מרץ",  cal: 1620 },
-        { month: "אפריל", cal: 1550 },
-        { month: "מאי",  cal: avgCalories },
-      ];
-
-      return (
-        <div style={{ padding: "22px 16px 0", display: "flex", flexDirection: "column", gap: 18 }}>
-          <div>
-            <div style={{ fontSize: 10, color: GOLD, fontWeight: 700, letterSpacing: 1, marginBottom: 3 }}>ניתוח מעמיק</div>
-            <div style={{ fontSize: 26, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900 }}>Analytics 📊</div>
-          </div>
-
-          <Card style={{ background: "linear-gradient(135deg,#101018,#0E0E16)", borderColor: "#22223A" }}>
-            <div style={{ fontSize: 10, color: BLUE, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>TDEE · הוצאה אנרגטית יומית</div>
-            <div style={{ display: "flex", gap: 20, marginBottom: 14 }}>
-              <div>
-                <div style={{ fontSize: 36, fontWeight: 900 }}>{estimatedTDEE}</div>
-                <div style={{ fontSize: 11, color: MUTED2 }}>קק״ל/יום</div>
-              </div>
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6, justifyContent: "center" }}>
-                <div style={{ fontSize: 12, color: MUTED2 }}>ממוצע קלוריות: <span style={{ color: TEXT, fontWeight: 700 }}>{avgCalories}</span></div>
-                <div style={{ fontSize: 12, color: MUTED2 }}>גירעון יומי: <span style={{ color: GREEN, fontWeight: 700 }}>-{dailyDeficit} קק״ל</span></div>
-                <div style={{ fontSize: 12, color: MUTED2 }}>קצב ירידה: <span style={{ color: GREEN, fontWeight: 700 }}>-{RATE_PER_WEEK} ק״ג/שבוע</span></div>
-              </div>
-            </div>
-            <div style={{ background: "#1A1A2A", borderRadius: 10, padding: 10 }}>
-              <div style={{ fontSize: 10, color: MUTED2, lineHeight: 1.6 }}>
-                🧮 <strong style={{ color: TEXT }}>חישוב:</strong> {avgCalories} + {dailyDeficit} (מהירידה במשקל) = <strong style={{ color: GOLD }}>{estimatedTDEE} קק״ל</strong>
-                <br />כמו MacroFactor – מחושב מצריכה + שינוי משקל, לא מנוסחת BMR
-              </div>
-            </div>
-          </Card>
-
-          <div>
-            <STitle>מאזן אנרגטי שבועי</STitle>
-            <Card style={{ padding: "14px 10px" }}>
-              <ResponsiveContainer width="100%" height={120}>
-                <BarChart data={weeklyLog} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                  <XAxis dataKey="day" tick={{ fill: MUTED2, fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis hide domain={[0, 2200]} />
-                  <ReferenceLine y={estimatedTDEE} stroke={BLUE} strokeDasharray="4 4" strokeWidth={1.5} />
-                  <Tooltip contentStyle={{ background: CARD2, border: "1px solid #2A2A2E", borderRadius: 8, fontSize: 11 }}
-                    formatter={(v, n, p) => {
-                      if (!v) return ["לא נרשם", ""];
-                      const diff = v - estimatedTDEE;
-                      return [`${diff > 0 ? "+" : ""}${diff} קק״ל`, "מאזן"];
-                    }} />
-                  <Bar dataKey="cal" radius={[4,4,0,0]}>
-                    {weeklyLog.map((d, i) => (
-                      <Cell key={i} fill={!d.logged ? "#252528" : d.cal <= estimatedTDEE ? GREEN : ORANGE} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <div style={{ fontSize: 10, color: MUTED2, textAlign: "center", marginTop: 4 }}>
-                - - TDEE {estimatedTDEE} קק״ל · <span style={{ color: GREEN }}>■ גירעון</span> · <span style={{ color: ORANGE }}>■ עודף</span>
-              </div>
-            </Card>
-          </div>
-
-          <div>
-            <STitle>ממוצע קלוריות לפי חודש</STitle>
-            <Card>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {monthlyAvg.map(m => (
-                  <div key={m.month}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                      <span style={{ fontWeight: 700 }}>{m.month}</span>
-                      <span style={{ color: Math.abs(m.cal - TARGET_CAL) < 100 ? GREEN : GOLD }}>
-                        {m.cal} <span style={{ color: MUTED2, fontWeight: 400 }}>קק״ל/יום</span>
-                      </span>
-                    </div>
-                    <BarUI value={m.cal} max={2200} color={Math.abs(m.cal - TARGET_CAL) < 100 ? GREEN : GOLD} h={8} />
-                    <div style={{ fontSize: 10, color: MUTED, marginTop: 3 }}>יעד: {TARGET_CAL}</div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          <div>
-            <STitle>עמידה במעקב תזונה</STitle>
-            <Card>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <div>
-                  <div style={{ fontSize: 36, fontWeight: 900, color: adherencePct >= 80 ? GREEN : ORANGE }}>{adherencePct}%</div>
-                  <div style={{ fontSize: 12, color: MUTED2 }}>{adherenceDays}/7 ימים השבוע</div>
-                </div>
-                <div style={{ fontSize: 11, color: MUTED2, maxWidth: 160, lineHeight: 1.6, textAlign: "right" }}>
-                  המערכת מסתגלת לפי מה שנרשם בפועל, כמו MacroFactor 🎯
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
-                {weeklyLog.map((d, i) => (
-                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                    <div style={{ height: Math.max(6, (d.cal / 2000) * 60), width: "100%",
-                      background: d.logged ? GREEN : "#252528", borderRadius: 4, maxWidth: 28 }} />
-                    <span style={{ fontSize: 9, color: MUTED2 }}>{d.day}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          <div>
-            <STitle>עמידה ביעדי מאקרו (ממוצע שבועי)</STitle>
-            <Card>
-              {[
-                { label: "חלבון",    avg: 88,  target: 130, col: GREEN },
-                { label: "פחמימות", avg: 145, target: 175, col: BLUE },
-                { label: "שומן",    avg: 48,  target: 58,  col: ORANGE },
-              ].map(m => (
-                <div key={m.label} style={{ marginBottom: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                    <span style={{ color: MUTED2 }}>{m.label}</span>
-                    <span>
-                      <span style={{ fontWeight: 700 }}>{m.avg}g</span>
-                      <span style={{ color: MUTED }}> / {m.target}g</span>
-                      <span style={{ color: m.avg >= m.target * 0.9 ? GREEN : ORANGE, marginRight: 6, fontWeight: 700 }}>
-                        {" "}{Math.round((m.avg/m.target)*100)}%
-                      </span>
-                    </span>
-                  </div>
-                  <BarUI value={m.avg} max={m.target} color={m.col} h={8} />
-                </div>
-              ))}
-            </Card>
-          </div>
-        </div>
-      );
-    }
-
-    // ── APP ────────────────────────────────────────────────────────────────────
-    function App() {
-      const [tab, setTab] = useState("dashboard");
-      const tabs = [
-        { id: "dashboard", icon: "⌂",  label: "בית" },
-        { id: "workout",   icon: "💪", label: "אימון" },
-        { id: "nutrition", icon: "🍽", label: "תזונה" },
-        { id: "progress",  icon: "📈", label: "מעקב" },
-        { id: "analytics", icon: "🧠", label: "ניתוח" },
-      ];
-
-      return (
-        <div style={{ background: BG, minHeight: "100vh", color: TEXT,
-        fontFamily: "'Heebo', sans-serif", direction: "rtl",
-        maxWidth: 440, margin: "0 auto", paddingBottom: 84 }}>
-          <style>{`@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@400;700;900&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } ::-webkit-scrollbar { display: none; } input { outline: none; } input:focus { border-color: ${GOLD}88 !important; } button:active { opacity: 0.75; }`}</style>
-
-          <div style={{ background: "#0E0E11", padding: "14px 20px 12px",
-            borderBottom: "1px solid #1A1A1E", position: "sticky", top: 0, zIndex: 50,
-            display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: 9, color: MUTED, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 2 }}>
-                COACHED BY DAN Z
-              </div>
-              <div style={{ fontSize: 20, fontFamily: "'Frank Ruhl Libre'", fontWeight: 900 }}>
-                תמר ס׳ <span style={{ color: GOLD }}>✦</span>
-              </div>
-            </div>
-            <div style={{ width: 42, height: 42, borderRadius: "50%",
-              background: `linear-gradient(135deg,${GOLD},${GOLD_DIM})`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 18, fontWeight: 900, color: "#000" }}>ת</div>
-          </div>
-
-          {tab === "dashboard" && <Dashboard setTab={setTab} />}
-          {tab === "workout"   && <Workout />}
-          {tab === "nutrition" && <Nutrition />}
-          {tab === "progress"  && <Progress />}
-          {tab === "analytics" && <Analytics />}
-
-          <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
-            width: "100%", maxWidth: 440, background: "#0A0A0D",
-            borderTop: "1px solid #1A1A1E", display: "flex",
-            paddingBottom: 16, paddingTop: 8, zIndex: 100 }}>
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                flex: 1, background: "none", border: "none", cursor: "pointer",
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-                color: tab === t.id ? GOLD : MUTED, transition: "color 0.2s", padding: "4px 0" }}>
-                <span style={{ fontSize: 22, lineHeight: 1 }}>{t.icon}</span>
-                <span style={{ fontSize: 10, fontFamily: "'Heebo'", fontWeight: tab === t.id ? 800 : 400 }}>{t.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // הרינדור של האפליקציה למסך
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
 </body>
 </html>
