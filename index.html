@@ -1,628 +1,791 @@
 <!DOCTYPE html>
-
-<html dir="rtl" lang="he">
+<html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0C0C0E">
-<title>תמר ס׳ | Coached by Dan Z</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&family=Frank+Ruhl+Libre:wght@700;900&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body,#root{height:100%;background:#0C0C0E}
-  body{font-family:'Heebo',sans-serif;direction:rtl;color:#F0EBE1;-webkit-tap-highlight-color:transparent}
-  ::-webkit-scrollbar{display:none}
-  input{outline:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>פרופיל אישי - תמר פדן</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Assistant', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#f8fafc',
+                            primary: '#0ea5e9',
+                            secondary: '#14b8a6',
+                            dark: '#0f172a',
+                            text: '#334155'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Hide scrollbar for horizontal scrolling tabs but keep functionality */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
+    </style>
 </head>
-<body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useRef, useEffect } = React;
-const { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } = Recharts;
+<body class="text-app-text antialiased pb-24 selection:bg-app-primary selection:text-white">
 
-const GOLD=”#C9A84C”,GOLD_DIM=”#7A5E1A”,BG=”#0C0C0E”,CARD=”#161618”,CARD2=”#1F1F23”,
-TEXT=”#F0EBE1”,MUTED=”#4A4A50”,MUTED2=”#888”,GREEN=”#4A9A50”,BLUE=”#4A7BAA”,
-ORANGE=”#C06640”,RED=”#A84040”;
-const TARGET_CAL=1750,CUR_W=66.3,GOAL_W=62.0,START_W=69.2,RATE=0.28;
+    <div class="max-w-3xl mx-auto p-4 sm:p-6">
+        
+        <!-- Header / Profile Card -->
+        <header class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8 mb-6 relative overflow-hidden border border-slate-100">
+            <!-- Decorative background elements -->
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-app-secondary to-app-primary rounded-full opacity-10 blur-2xl"></div>
+            <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-gradient-to-tr from-blue-400 to-emerald-400 rounded-full opacity-10 blur-2xl"></div>
+            
+            <div class="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-right">
+                <!-- Avatar -->
+                <div class="relative">
+                    <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-app-primary to-app-secondary p-1 shadow-lg">
+                        <div class="w-full h-full bg-white rounded-full flex items-center justify-center border-4 border-white overflow-hidden">
+                            <i data-lucide="user" class="w-12 h-12 text-slate-300"></i>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-1 left-1 bg-green-500 border-2 border-white w-5 h-5 rounded-full" title="פעילה"></div>
+                </div>
+                
+                <!-- Info -->
+                <div class="flex-1 mt-2">
+                    <h1 class="text-3xl font-black text-slate-800 tracking-tight">תמר פדן</h1>
+                    <p class="text-app-secondary font-semibold text-lg mt-1">מתאמנת כוח ופיתוח גוף</p>
+                    
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-4">
+                        <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 text-sm font-medium px-3 py-1.5 rounded-xl">
+                            <i data-lucide="calendar" class="w-4 h-4"></i> בת 25
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 bg-sky-50 text-sky-600 text-sm font-medium px-3 py-1.5 rounded-xl">
+                            <i data-lucide="award" class="w-4 h-4"></i> מתאמנת פעילה
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-const weightData=[
-{date:“1/3”,w:69.2,trend:69.2},{date:“8/3”,w:68.8,trend:69.0},
-{date:“15/3”,w:68.5,trend:68.8},{date:“22/3”,w:68.9,trend:68.7},
-{date:“29/3”,w:68.1,trend:68.5},{date:“5/4”,w:67.8,trend:68.2},
-{date:“12/4”,w:67.4,trend:67.9},{date:“19/4”,w:67.6,trend:67.7},
-{date:“26/4”,w:67.0,trend:67.4},{date:“3/5”,w:66.6,trend:67.1},
-{date:“7/5”,w:66.3,trend:66.8},
-];
-const weeklyLog=[
-{day:“א’”,cal:1520,ok:true},{day:“ב’”,cal:1390,ok:true},{day:“ג’”,cal:0,ok:false},
-{day:“ד’”,cal:1680,ok:true},{day:“ה’”,cal:1450,ok:true},{day:“ו’”,cal:1510,ok:true},
-{day:“ש’”,cal:1320,ok:true},
-];
-const MEALS=[
-{id:1,name:“ארוחת בוקר”,items:[“2 ביצים”,“לחם מלא ×2”,“גבינה לבנה 5%”],cal:380,p:28,c:34,f:14},
-{id:2,name:“צהריים”,items:[“חזה עוף 150g”,“אורז מלא 80g”,“ירקות מאודים”],cal:520,p:42,c:58,f:8},
-{id:3,name:“ביניים”,items:[“קוטג׳ 5%”,“בננה”],cal:220,p:18,c:30,f:5},
-];
-const INIT_EX=[
-{id:1,name:“לחיצת חזה”,sets:4,reps:10,tw:45,pr:“52 ק״ג”},
-{id:2,name:“חתירה בטה”,sets:4,reps:10,tw:40,pr:“48 ק״ג”},
-{id:3,name:“לחיצת כתפיים”,sets:3,reps:10,tw:22.5,pr:“27.5 ק״ג”},
-{id:4,name:“תלייה מורחבת”,sets:3,reps:8,tw:0,pr:null,bw:true},
-{id:5,name:“כפיפות מרפק”,sets:3,reps:12,tw:12,pr:“15 ק״ג”},
-];
-const PRS=[
-{name:“סקוואט”,val:80,prev:75,date:“15/4”,unit:“ק״ג”,medal:“🥇”},
-{name:“לחיצת חזה”,val:52,prev:47.5,date:“22/4”,unit:“ק״ג”,medal:“🥈”},
-{name:“דדליפט”,val:90,prev:85,date:“28/4”,unit:“ק״ג”,medal:“🥉”},
-{name:“לחיצת כתפיים”,val:27.5,prev:25,date:“5/5”,unit:“ק״ג”,medal:“🏅”},
-{name:“תלייה”,val:10,prev:8,date:“2/5”,unit:“חז’”,medal:“🏅”},
-];
+        <!-- Navigation Tabs -->
+        <nav class="mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 relative">
+            <!-- Fade masks for scroll indication on mobile -->
+            <div class="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-[#f8fafc] to-transparent z-10 sm:hidden"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#f8fafc] to-transparent z-10 sm:hidden"></div>
+            
+            <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x items-center w-full after:content-[''] after:shrink-0 after:w-2">
+                <button data-target="profileContent" class="nav-tab snap-center shrink-0 px-6 py-3 rounded-2xl bg-gradient-to-r from-app-secondary to-app-primary text-white font-bold whitespace-nowrap shadow-md transition-all flex items-center gap-2">
+                    <i data-lucide="user-circle" class="w-5 h-5"></i> פרטים אישיים
+                </button>
+                <button data-target="progressContent" class="nav-tab snap-center shrink-0 px-6 py-3 rounded-2xl bg-white text-slate-600 font-bold whitespace-nowrap hover:bg-slate-50 transition-all border border-slate-200 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i> מטרות והישגים
+                </button>
+                <button data-target="plansContent" class="nav-tab snap-center shrink-0 px-6 py-3 rounded-2xl bg-white text-slate-600 font-bold whitespace-nowrap hover:bg-slate-50 transition-all border border-slate-200 flex items-center gap-2">
+                    <i data-lucide="dumbbell" class="w-5 h-5"></i> תוכניות אימון
+                </button>
+                <button data-target="nutritionContent" class="nav-tab snap-center shrink-0 px-6 py-3 rounded-2xl bg-white text-slate-600 font-bold whitespace-nowrap hover:bg-slate-50 transition-all border border-slate-200 flex items-center gap-2">
+                    <i data-lucide="apple" class="w-5 h-5"></i> תזונה
+                </button>
+                <button data-target="cardioContent" class="nav-tab snap-center shrink-0 ml-4 sm:ml-0 px-6 py-3 rounded-2xl bg-white text-slate-600 font-bold whitespace-nowrap hover:bg-slate-50 transition-all border border-slate-200 flex items-center gap-2">
+                    <i data-lucide="activity" class="w-5 h-5"></i> אירובי
+                </button>
+            </div>
+        </nav>
 
-const loggedDays=weeklyLog.filter(d=>d.ok);
-const avgCal=Math.round(loggedDays.reduce((a,d)=>a+d.cal,0)/loggedDays.length);
-const dailyDef=Math.round((RATE*7700)/7);
-const TDEE=avgCal+dailyDef;
-const adh=Math.round((loggedDays.length/7)*100);
-const weeksLeft=Math.ceil((CUR_W-GOAL_W)/RATE);
-const progPct=Math.round(((START_W-CUR_W)/(START_W-GOAL_W))*100);
-const totCal=MEALS.reduce((a,m)=>a+m.cal,0);
-const totP=MEALS.reduce((a,m)=>a+m.p,0);
-const totC=MEALS.reduce((a,m)=>a+m.c,0);
-const totF=MEALS.reduce((a,m)=>a+m.f,0);
+        <!-- Tab Contents -->
+        <main id="contentPanes" class="relative pb-10">
+            
+            <!-- 1. Profile / Info Tab -->
+            <div id="profileContent" class="tab-pane block animate-fade-in space-y-6">
+                <!-- Data Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-sky-50 rounded-full flex items-center justify-center mb-3 text-app-primary">
+                            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-sm text-slate-500 font-semibold">תאריך התחלה</p>
+                        <p class="text-xl font-black text-slate-800 mt-1">12.05.26</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-3 text-emerald-500">
+                            <i data-lucide="scale" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-sm text-slate-500 font-semibold">משקל התחלתי</p>
+                        <p class="text-xl font-black text-slate-800 mt-1">-- ק"ג</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center relative group cursor-pointer hover:border-app-primary transition-colors">
+                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-3 text-blue-600">
+                            <i data-lucide="line-chart" class="w-5 h-5 graph-icon" data-exercise="bodyWeight" data-exercise-name="משקל גוף"></i>
+                        </div>
+                        <p class="text-sm text-slate-500 font-semibold">משקל עדכני</p>
+                        <p class="text-xl font-black text-blue-600 mt-1">-- ק"ג</p>
+                        <span class="absolute bottom-2 text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition">לחץ לגרף</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mb-3 text-purple-500">
+                            <i data-lucide="flame" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-sm text-slate-500 font-semibold">הישג בולט</p>
+                        <p class="text-lg font-black text-slate-800 mt-1">דדליפט 35 ק"ג ל-8</p>
+                    </div>
+                </div>
 
-const todayStr=()=>{
-const days=[“ראשון”,“שני”,“שלישי”,“רביעי”,“חמישי”,“שישי”,“שבת”];
-const months=[“ינואר”,“פברואר”,“מרץ”,“אפריל”,“מאי”,“יוני”,“יולי”,“אוגוסט”,“ספטמבר”,“אוקטובר”,“נובמבר”,“דצמבר”];
-const d=new Date();
-return `יום ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
-};
+                <!-- Goals Section -->
+                <div class="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <i data-lucide="target" class="text-app-secondary"></i> מטרות ויעדים
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="mt-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-app-primary shadow-sm shrink-0">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">התחזקות כללית ובניית כוח</h4>
+                                <p class="text-slate-600 text-sm mt-1">בניית בסיס כוח חזק, שיפור משקלי עבודה בתרגילי ליבה ורכישת טכניקה נכונה.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="mt-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-app-primary shadow-sm shrink-0">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">הגדלת מסת שריר (היפרטרופיה)</h4>
+                                <p class="text-slate-600 text-sm mt-1">עלייה במסת השריר בדגש על פרופורציות, עיצוב וחיטוב הגוף לאורך זמן.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-// ── UI Atoms ──
-function Card({children,style={},onClick}){
-return <div onClick={onClick} style={{background:CARD,borderRadius:18,padding:16,border:“1px solid #1E1E22”,cursor:onClick?“pointer”:“default”,…style}}>{children}</div>;
-}
-function STitle({children}){
-return <div style={{fontSize:10,fontWeight:800,letterSpacing:3,color:MUTED2,textTransform:“uppercase”,marginBottom:12}}>{children}</div>;
-}
-function BarUI({value,max,color,h=7}){
-const p=Math.min(100,Math.round((value/max)*100));
-return <div style={{background:”#252528”,borderRadius:99,height:h,overflow:“hidden”}}>
-<div style={{width:`${p}%`,height:“100%”,background:color,borderRadius:99,transition:“width 0.7s”}}/>
+            <!-- 2. Progress / Goals Tab -->
+            <div id="progressContent" class="tab-pane hidden animate-fade-in space-y-8">
+                
+                <!-- Core Exercises -->
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 mb-5">התקדמות בתרגילי ליבה</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative group">
+                            <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-bold text-slate-800">סקוואט</h3>
+                                    <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center hover:bg-app-primary hover:text-white transition-colors group">
+                                        <i data-lucide="line-chart" class="w-5 h-5 text-slate-400 group-hover:text-white graph-icon" data-exercise="squat" data-exercise-name="סקוואט"></i>
+                                    </button>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">התחלה</span>
+                                    <span class="font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">30 ק"ג</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-emerald-600">שיא אישי</span>
+                                    <span class="font-black text-lg text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">30 ק"ג (5 ח')</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-slate-800">דדליפט רומני</h3>
+                                <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center hover:bg-app-primary hover:text-white transition-colors group">
+                                    <i data-lucide="line-chart" class="w-5 h-5 text-slate-400 group-hover:text-white graph-icon" data-exercise="romanianDeadlift" data-exercise-name="דדליפט רומני"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">התחלה</span>
+                                    <span class="font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">35 ק"ג</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-emerald-600">שיא אישי</span>
+                                    <span class="font-black text-lg text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">35 ק"ג (8 ח')</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-slate-800">פולי עליון במכונה</h3>
+                                <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center hover:bg-app-primary hover:text-white transition-colors group">
+                                    <i data-lucide="line-chart" class="w-5 h-5 text-slate-400 group-hover:text-white graph-icon" data-exercise="latPulldown" data-exercise-name="פולי עליון במכונה"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">התחלה</span>
+                                    <span class="font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">20 ק"ג כ"צ</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-emerald-600">שיא אישי</span>
+                                    <span class="font-black text-lg text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">20 כ"צ (5 ח')</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Full Records Table -->
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-slate-800">טבלת שיאים מלאה</h2>
+                        <i data-lucide="list-ordered" class="text-slate-400"></i>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right text-slate-600">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-bold rounded-tr-xl whitespace-nowrap">תרגיל</th>
+                                    <th scope="col" class="px-6 py-4 font-bold whitespace-nowrap hidden sm:table-cell">התחלה</th>
+                                    <th scope="col" class="px-6 py-4 font-bold whitespace-nowrap">שיא נוכחי</th>
+                                    <th scope="col" class="px-6 py-4 font-bold rounded-tl-xl whitespace-nowrap">תאריך</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>סקוואט</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="squat" data-exercise-name="סקוואט"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">30 ק"ג (5 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">30 ק"ג ל-5</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>דדליפט רומני</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="romanianDeadlift" data-exercise-name="דדליפט רומני"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">35 ק"ג (8 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">35 ק"ג ל-8</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>פולי עליון במכונה</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="latPulldown" data-exercise-name="פולי עליון במכונה"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">20 ק"ג כ"צ (5 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">20 ק"ג כ"צ ל-5</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>לחיצת כתפיים מוט</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="overheadPress" data-exercise-name="לחיצת כתפיים מוט"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">20 ק"ג (3 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">20 ק"ג ל-3</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>היפטראסט</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="hipThrust" data-exercise-name="היפטראסט"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">12.5 ק"ג כ"צ (6 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">12.5 ק"ג כ"צ ל-6</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>כפיפת ברכיים בשכיבה</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="lyingLegCurl" data-exercise-name="כפיפת ברכיים בשכיבה"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">4 פלטות (5 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">4 פלטות ל-5</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>סקוואט בולגרי (יד אחת)</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="bulgarianSplitSquat" data-exercise-name="סקוואט בולגרי"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">12.5 ק"ג (5 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">12.5 ק"ג ל-5</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>פשיטה מאחורי הראש חבל</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="overheadTricepsExtension" data-exercise-name="פשיטה מאחורי הראש חבל"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">5 פלטות (10 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">5 פלטות ל-10</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <span>מקבילים (גרביטון)</span>
+                                            <button class="p-1.5 rounded-lg bg-slate-100 hover:bg-app-primary hover:text-white transition-colors group" title="הצג גרף התקדמות">
+                                                <i data-lucide="line-chart" class="w-4 h-4 text-slate-400 group-hover:text-white graph-icon" data-exercise="assistedDips" data-exercise-name="מקבילים"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 hidden sm:table-cell">-35 ק"ג (5 ח')</td>
+                                    <td class="px-6 py-4 font-bold text-emerald-600">-35 ק"ג ל-5</td>
+                                    <td class="px-6 py-4 text-slate-400">12.05.26</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-  </div>;
-}
-function Ring({p,color,size=104,stroke=10,children}){
-  const r=(size-stroke)/2, circ=2*Math.PI*r, dash=(Math.min(100,p)/100)*circ;
-  return <div style={{position:"relative",width:size,height:size,flexShrink:0}}>
-    <svg width={size} height={size} style={{transform:"rotate(-90deg)"}}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#252528" strokeWidth={stroke}/>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-        strokeDasharray={`${dash} ${circ-dash}`} strokeLinecap="round"
-        style={{transition:"stroke-dasharray 0.7s"}}/>
-    </svg>
-    <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>{children}</div>
-  </div>;
-}
-function EnergyBar({intake,tdee}){
-  const diff=intake-tdee, isDef=diff<0;
-  const barPct=Math.min(48,(Math.abs(diff)/tdee)*100*3);
-  return <div>
-    <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:MUTED2,marginBottom:8}}>
-      <span>עודף</span>
-      <span style={{fontWeight:700,color:TEXT,fontSize:12}}>{isDef?"גירעון":"עודף"}: <span style={{color:isDef?GREEN:ORANGE}}>{Math.abs(diff)} קק״ל</span></span>
-      <span>גירעון</span>
+            <!-- 3. Plans Tab -->
+            <div id="plansContent" class="tab-pane hidden animate-fade-in space-y-6">
+                <!-- Training Tips -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-6 shadow-md text-white mb-6">
+                        <div class="flex gap-4 items-center mb-4">
+                            <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+                                <i data-lucide="brain" class="w-6 h-6 text-sky-400"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">דגשים וטכניקה</h3>
+                        </div>
+                        <ul class="space-y-3 text-slate-300">
+                            <li class="flex gap-2 items-start">
+                                <i data-lucide="chevron-left" class="w-4 h-4 mt-1 text-app-primary"></i> 
+                                <span><strong>נשימה וברייסינג:</strong> טכניקת ברייס! להוציא אוויר כשמושך או דוחף. לקחת אוויר במתיחה ותמיד לשמור על בטן מכווצת חזק.</span>
+                            </li>
+                            <li class="flex gap-2 items-start">
+                                <i data-lucide="chevron-left" class="w-4 h-4 mt-1 text-app-primary"></i> 
+                                <span><strong>חימום:</strong> לבצע חימום בהדרגה עד למשקל העבודה (1-3 סטים חימום לפני סטי העבודה).</span>
+                            </li>
+                            <li class="flex gap-2 items-start">
+                                <i data-lucide="chevron-left" class="w-4 h-4 mt-1 text-app-primary"></i> 
+                                <span><strong>מנוחות ועצימות:</strong> לנוח בין סטים לפחות דקה. לא להיכנס לסט אם עדיין שורף או עייפים. לעבוד 1-2 חזרות לפני כשל.</span>
+                            </li>
+                        </ul>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Workout A -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center font-black text-xl">A</div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">אימון A</h3>
+                                <p class="text-xs text-slate-500">יוזן בהמשך</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 text-sm font-medium text-slate-700">
+                            <li class="text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                טרם הוזנו תרגילים לתוכנית זו
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Workout B -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-xl">B</div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">אימון B</h3>
+                                <p class="text-xs text-slate-500">יוזן בהמשך</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 text-sm font-medium text-slate-700">
+                            <li class="text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                טרם הוזנו תרגילים לתוכנית זו
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Workout C -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center font-black text-xl">C</div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">אימון C</h3>
+                                <p class="text-xs text-slate-500">יוזן בהמשך</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 text-sm font-medium text-slate-700">
+                            <li class="text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                טרם הוזנו תרגילים לתוכנית זו
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Nutrition Tab -->
+            <div id="nutritionContent" class="tab-pane hidden animate-fade-in space-y-6">
+                <!-- Macro Summary -->
+                <div class="bg-slate-900 rounded-3xl p-6 sm:p-8 text-center text-white shadow-xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-50"></div>
+                    <div class="relative z-10">
+                        <h3 class="text-3xl font-black mb-1">-- קלוריות</h3>
+                        <p class="text-slate-400 text-sm mb-6">יעד יומי מותאם אישית (יוזן בהמשך)</p>
+                        
+                        <div class="flex flex-wrap justify-center gap-6 sm:gap-12">
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-2">
+                                    <span class="text-2xl font-bold text-blue-400">--</span>
+                                </div>
+                                <span class="text-xs uppercase font-bold text-slate-400">חלבון (ג')</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-2">
+                                    <span class="text-2xl font-bold text-emerald-400">--</span>
+                                </div>
+                                <span class="text-xs uppercase font-bold text-slate-400">פחמימה (ג')</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center mb-2">
+                                    <span class="text-2xl font-bold text-amber-400">--</span>
+                                </div>
+                                <span class="text-xs uppercase font-bold text-slate-400">שומן (ג')</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meals Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-center min-h-[150px]">
+                        <p class="text-slate-400 font-medium text-center">התפריט יוזן בקרוב</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-app-primary/20 flex items-center justify-center min-h-[150px] transform sm:-translate-y-2">
+                        <p class="text-slate-400 font-medium text-center">התפריט יוזן בקרוב</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-center min-h-[150px]">
+                        <p class="text-slate-400 font-medium text-center">התפריט יוזן בקרוב</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Cardio Tab -->
+            <div id="cardioContent" class="tab-pane hidden animate-fade-in space-y-6">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-center">
+                    <div class="w-16 h-16 mx-auto bg-rose-50 rounded-full flex items-center justify-center text-rose-400 mb-4">
+                        <i data-lucide="wind" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">תוכנית אירובי והתאוששות</h3>
+                    <p class="text-slate-500">הנחיות ופרוטוקולי אירובי יוזנו לכאן בהמשך בהתאם להתקדמות התוכנית.</p>
+                </div>
+            </div>
+
+        </main>
+        
     </div>
-    <div style={{position:"relative",height:12,background:"#1E1E22",borderRadius:99}}>
-      <div style={{position:"absolute",left:"50%",top:0,bottom:0,width:2,background:"#333",transform:"translateX(-50%)"}}/>
-      <div style={{position:"absolute",top:2,bottom:2,borderRadius:99,background:isDef?GREEN:ORANGE,width:`${barPct}%`,right:isDef?"50%":undefined,left:isDef?undefined:"50%"}}/>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 transform scale-95 transition-transform">
+            <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+                <h3 id="videoModalTitle" class="text-xl font-bold text-slate-800">הוספת סרטון הדרכה</h3>
+                <button id="closeVideoModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p id="videoModalExerciseName" class="text-lg font-bold text-app-primary bg-sky-50 px-4 py-2 rounded-xl inline-block"></p>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-600">קישור מיוטיוב:</label>
+                    <input id="youtubeLinkInput" type="text" placeholder="https://youtube.com/watch?v=..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-app-primary focus:ring-2 focus:ring-app-primary/20 transition-all dir-ltr text-left">
+                </div>
+                <button id="embedVideoButton" class="w-full bg-app-primary text-white font-bold py-3 rounded-xl hover:bg-sky-600 transition-colors shadow-sm">הצג סרטון במסך</button>
+                <div id="videoEmbedContainer" class="aspect-video bg-slate-100 rounded-2xl mt-4 overflow-hidden shadow-inner hidden"></div>
+            </div>
+        </div>
     </div>
-    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:MUTED,marginTop:5}}>
-      <span>↑ +500</span><span>TDEE: {tdee} קק״ל</span><span>↓ -500</span>
-    </div>
-  </div>;
-}
-function GoalETA(){
-  return <Card style={{background:"linear-gradient(135deg,#111A0E,#0C120A)",borderColor:"#1E3018"}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-      <div>
-        <div style={{fontSize:10,color:GREEN,fontWeight:700,letterSpacing:1,marginBottom:3}}>ETA ליעד</div>
-        <div style={{fontSize:28,fontWeight:900}}>{weeksLeft} <span style={{fontSize:14,fontWeight:400,color:MUTED2}}>שבועות</span></div>
-        <div style={{fontSize:11,color:MUTED2,marginTop:2}}>{CUR_W} → {GOAL_W} ק״ג</div>
-      </div>
-      <Ring p={progPct} color={GREEN} size={72} stroke={7}>
-        <div style={{fontSize:13,fontWeight:900,color:GREEN}}>{progPct}%</div>
-      </Ring>
-    </div>
-    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:MUTED2,marginBottom:6}}>
-      <span>התחלה {START_W}</span><span style={{color:GOLD}}>● {CUR_W} ק״ג</span><span>יעד {GOAL_W}</span>
-    </div>
-    <div style={{position:"relative",background:"#1E2A1E",borderRadius:99,height:8}}>
-      <div style={{width:`${progPct}%`,height:"100%",background:`linear-gradient(90deg,${GREEN}88,${GREEN})`,borderRadius:99,position:"relative"}}>
-        <div style={{position:"absolute",left:"100%",top:"50%",transform:"translate(-50%,-50%)",width:14,height:14,background:GOLD,borderRadius:"50%",border:"2px solid #0C120A",boxShadow:`0 0 8px ${GOLD}88`}}/>
-      </div>
-    </div>
-    <div style={{fontSize:11,color:MUTED2,marginTop:8}}>קצב: <span style={{color:GREEN,fontWeight:700}}>-{RATE} ק״ג/שבוע</span> · על פי EWMA</div>
-  </Card>;
-}
 
-// ── DASHBOARD ──
-function Dashboard({setTab}){
-const hour=new Date().getHours();
-const gr=hour<12?“בוקר טוב”:hour<17?“צהריים טובים”:“ערב טוב”;
-const diff=totCal-TDEE;
-return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:16}}>
-<div>
-<div style={{fontSize:12,color:MUTED2,marginBottom:3}}>{todayStr()}</div>
-<div style={{fontSize:30,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900,lineHeight:1.15}}>{gr},<br/><span style={{color:GOLD}}>תמר</span> ✨</div>
-</div>
-<Card style={{background:“linear-gradient(135deg,#1A1A0E,#141409)”,borderColor:”#2A2A10”}}>
-<div style={{display:“flex”,gap:12,alignItems:“flex-start”}}>
-<div style={{width:40,height:40,borderRadius:“50%”,flexShrink:0,background:`linear-gradient(135deg,${GOLD},${GOLD_DIM})`,display:“flex”,alignItems:“center”,justifyContent:“center”,fontWeight:800,fontSize:16,color:”#000”}}>ד</div>
-<div>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:5}}>דן מ׳ · עכשיו</div>
-<div style={{fontSize:13.5,lineHeight:1.65}}>תמר 🌟 על פי ה-EWMA את בקצב של -{RATE} ק״ג/שבוע. עוד {weeksLeft} שבועות ליעד! יאללה 💪</div>
-</div>
-</div>
-</Card>
-<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr 1fr”,gap:10}}>
-{[{l:“אימונים”,v:“3/4”,s:“השבוע”,c:GOLD},{l:“רצף”,v:“12”,s:“ימים 🔥”,c:”#E07030”},{l:“מעקב”,v:`${adh}%`,s:“השבוע”,c:BLUE}].map(s=>
-<Card key={s.l} style={{padding:“14px 10px”,textAlign:“center”}}>
-<div style={{fontSize:22,fontWeight:900,color:s.c}}>{s.v}</div>
-<div style={{fontSize:11,color:MUTED2,marginTop:2}}>{s.l}</div>
-<div style={{fontSize:10,color:MUTED,marginTop:1}}>{s.s}</div>
-</Card>
-)}
-</div>
-<Card style={{background:”#111114”,borderColor:”#222226”}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:14}}>
-<div>
-<div style={{fontSize:10,color:MUTED2,fontWeight:700,letterSpacing:1,marginBottom:3}}>TDEE · הוצאה יומית</div>
-<div style={{fontSize:24,fontWeight:900}}>{TDEE} <span style={{fontSize:13,color:MUTED2,fontWeight:400}}>קק״ל</span></div>
-</div>
-<div style={{textAlign:“center”,background:”#1A1A1E”,padding:“8px 14px”,borderRadius:12}}>
-<div style={{fontSize:11,color:MUTED2,marginBottom:2}}>ממוצע שבועי</div>
-<div style={{fontSize:18,fontWeight:800,color:GOLD}}>{avgCal}</div>
-<div style={{fontSize:10,color:MUTED2}}>קק״ל/יום</div>
-</div>
-</div>
-<EnergyBar intake={totCal} tdee={TDEE}/>
-</Card>
-<GoalETA/>
-<Card onClick={()=>setTab(“workout”)} style={{background:“linear-gradient(135deg,#1C1808,#111008)”,borderColor:”#2A2408”}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
-<div>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:5}}>אימון היום</div>
-<div style={{fontSize:19,fontWeight:800}}>כוח עילי A 💪</div>
-<div style={{fontSize:12,color:MUTED2,marginTop:4}}>5 תרגילים · ~55 דק׳</div>
-</div>
-<div style={{background:GOLD,color:”#000”,borderRadius:12,padding:“10px 18px”,fontWeight:900,fontSize:14,border:“none”}}>← פתח</div>
-</div>
-</Card>
-<div>
-<STitle>תזונה היום</STitle>
-<Card>
-<div style={{display:“flex”,gap:16,alignItems:“center”}}>
-<Ring p={Math.min(100,Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={100} stroke={9}>
-<div style={{textAlign:“center”}}>
-<div style={{fontSize:19,fontWeight:900,color:GOLD}}>{totCal}</div>
-<div style={{fontSize:9,color:MUTED2}}>/ {TARGET_CAL}</div>
-<div style={{fontSize:9,color:GREEN,fontWeight:600,marginTop:1}}>{TARGET_CAL-totCal} נותרו</div>
-</div>
-</Ring>
-<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:10}}>
-{[{l:“חלבון”,c:totP,t:130,col:GREEN},{l:“פחמימות”,c:totC,t:175,col:BLUE},{l:“שומן”,c:totF,t:58,col:ORANGE}].map(m=>
-<div key={m.l}>
-<div style={{display:“flex”,justifyContent:“space-between”,fontSize:11,marginBottom:4}}>
-<span style={{color:MUTED2}}>{m.l}</span>
-<span style={{fontWeight:700}}>{m.c}<span style={{color:MUTED,fontWeight:400}}>/{m.t}g</span></span>
-</div>
-<BarUI value={m.c} max={m.t} color={m.col} h={6}/>
-</div>
-)}
-</div>
-</div>
-</Card>
-</div>
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
 
-  </div>;
-}
+        // Data for exercises
+        const progressData = {
+            squat: [{ date: '12.05', weight: 30, reps: 5 }],
+            romanianDeadlift: [{ date: '12.05', weight: 35, reps: 8 }],
+            benchPress: [],
+            latPulldown: [{ date: '12.05', weight: 20, reps: 5 }],
+            overheadPress: [{ date: '12.05', weight: 20, reps: 3 }],
+            hipThrust: [{ date: '12.05', weight: 12.5, reps: 6 }],
+            lyingLegCurl: [{ date: '12.05', weight: 4, reps: 5 }],
+            bulgarianSplitSquat: [{ date: '12.05', weight: 12.5, reps: 5 }],
+            overheadTricepsExtension: [{ date: '12.05', weight: 5, reps: 10 }],
+            assistedDips: [{ date: '12.05', weight: -35, reps: 5 }],
+            bodyWeight: []
+        };
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- TAB LOGIC ---
+            const tabs = document.querySelectorAll('.nav-tab');
+            const panes = document.querySelectorAll('.tab-pane');
 
-// ── WORKOUT ──
-function Workout(){
-const [exs,setExs]=useState(INIT_EX.map(e=>({…e,logged:[]})));
-const [sel,setSel]=useState(null);
-const [iReps,setIReps]=useState(””); const [iWeight,setIWeight]=useState(””);
-const [timerSec,setTimerSec]=useState(null); const [timerTotal,setTimerTotal]=useState(90);
-const intRef=useRef(null);
-const startTimer=secs=>{
-clearInterval(intRef.current); setTimerTotal(secs); setTimerSec(secs);
-intRef.current=setInterval(()=>setTimerSec(p=>{if(p<=1){clearInterval(intRef.current);return null;}return p-1;}),1000);
-};
-useEffect(()=>()=>clearInterval(intRef.current),[]);
-const logSet=ex=>{
-const reps=parseInt(iReps)||ex.reps, weight=iWeight!==’’?parseFloat(iWeight):ex.tw;
-setExs(prev=>prev.map(e=>e.id===ex.id?{…e,logged:[…e.logged,{reps,weight}]}:e));
-setIReps(””); setIWeight(””); startTimer(90);
-};
-const done=exs.filter(e=>e.logged.length>=e.sets).length;
-return <div style={{padding:“22px 16px 0”}}>
-<div style={{marginBottom:18}}>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:4}}>אימון היום</div>
-<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>כוח עילי A</div>
-<div style={{fontSize:12,color:MUTED2,marginTop:4}}>{done}/{exs.length} תרגילים</div>
-<div style={{marginTop:10}}><BarUI value={done} max={exs.length} color={GOLD} h={5}/></div>
-</div>
-{timerSec!==null&&<Card style={{background:”#1A1408”,borderColor:”#2E2510”,marginBottom:16,padding:“12px 16px”}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
-<div style={{fontSize:12,color:MUTED2}}>⏱ מנוחה</div>
-<div style={{fontSize:30,fontWeight:900,color:GOLD,fontVariantNumeric:“tabular-nums”}}>
-{String(Math.floor(timerSec/60)).padStart(2,“0”)}:{String(timerSec%60).padStart(2,“0”)}
-</div>
-<button onClick={()=>{clearInterval(intRef.current);setTimerSec(null);}} style={{background:”#2A2A2E”,border:“none”,color:TEXT,borderRadius:8,padding:“6px 12px”,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,fontSize:12}}>דלג</button>
-</div>
-<div style={{marginTop:8}}><BarUI value={timerTotal-timerSec} max={timerTotal} color={GOLD} h={4}/></div>
-</Card>}
-<div style={{display:“flex”,flexDirection:“column”,gap:12}}>
-{exs.map(ex=>{
-const isDone=ex.logged.length>=ex.sets, isOpen=sel===ex.id;
-return <Card key={ex.id} onClick={()=>!isDone&&setSel(isOpen?null:ex.id)}
-style={{borderColor:isDone?”#2A442A”:isOpen?”#2A2614”:”#1E1E22”,background:isDone?”#101A10”:isOpen?”#1A1A0E”:CARD}}>
-<div style={{display:“flex”,alignItems:“center”,gap:10}}>
-<div style={{width:28,height:28,borderRadius:“50%”,flexShrink:0,background:isDone?GREEN:”#252528”,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:12,fontWeight:700,color:isDone?”#fff”:MUTED2}}>
-{isDone?“✓”:ex.logged.length}
-</div>
-<div style={{flex:1}}>
-<div style={{display:“flex”,alignItems:“center”,gap:8,flexWrap:“wrap”}}>
-<span style={{fontSize:15,fontWeight:700}}>{ex.name}</span>
-{ex.pr&&<span style={{fontSize:9,background:”#2A1A06”,color:GOLD,padding:“2px 7px”,borderRadius:99,fontWeight:700}}>שיא {ex.pr}</span>}
-</div>
-<div style={{fontSize:12,color:MUTED2,marginTop:3}}>{ex.sets} × {ex.reps} חז’{!ex.bw&&` · יעד: ${ex.tw} ק״ג`}</div>
-</div>
-{!isDone&&<div style={{fontSize:16,color:isOpen?GOLD:MUTED,transform:isOpen?“rotate(180deg)”:“none”,transition:“transform 0.2s”}}>⌄</div>}
-</div>
-<div style={{display:“flex”,gap:6,marginTop:10,marginRight:38}}>
-{Array.from({length:ex.sets}).map((_,i)=>
-<div key={i} style={{width:36,height:36,borderRadius:10,background:i<ex.logged.length?GREEN:”#252528”,display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,fontSize:10,fontWeight:700,color:i<ex.logged.length?”#fff”:MUTED,transition:“background 0.3s”}}>
-{i<ex.logged.length?<><span>{ex.logged[i].reps}</span>{!ex.bw&&<span style={{fontSize:8,fontWeight:400,color:”#9fd09f”}}>{ex.logged[i].weight}k</span>}</>:<span style={{fontSize:11}}>{i+1}</span>}
-</div>
-)}
-</div>
-{isOpen&&!isDone&&<div style={{marginTop:14,paddingTop:14,borderTop:“1px solid #2A2A2E”,display:“flex”,gap:10,alignItems:“flex-end”}} onClick={e=>e.stopPropagation()}>
-<div style={{flex:1}}>
-<div style={{fontSize:10,color:MUTED2,marginBottom:5}}>חזרות</div>
-<input type=“number” value={iReps} placeholder={ex.reps} onChange={e=>setIReps(e.target.value)} style={{width:“100%”,background:”#252528”,border:“1px solid #333”,borderRadius:10,padding:10,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”,textAlign:“center”}}/>
-</div>
-{!ex.bw&&<div style={{flex:1}}>
-<div style={{fontSize:10,color:MUTED2,marginBottom:5}}>ק״ג</div>
-<input type=“number” value={iWeight} placeholder={ex.tw} onChange={e=>setIWeight(e.target.value)} style={{width:“100%”,background:”#252528”,border:“1px solid #333”,borderRadius:10,padding:10,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”,textAlign:“center”}}/>
-</div>}
-<button onClick={()=>logSet(ex)} style={{background:GOLD,color:”#000”,border:“none”,borderRadius:12,padding:“12px 18px”,fontWeight:900,fontSize:14,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,flexShrink:0}}>סט {ex.logged.length+1} ✓</button>
-</div>}
-</Card>;
-})}
-</div>
-{done===exs.length&&<Card style={{marginTop:20,background:“linear-gradient(135deg,#162016,#0E160E)”,borderColor:”#2A442A”,textAlign:“center”,padding:“28px 20px”}}>
-<div style={{fontSize:44,marginBottom:10}}>🎉</div>
-<div style={{fontSize:24,fontWeight:900,color:GREEN,fontFamily:”‘Frank Ruhl Libre’,serif”}}>האימון הושלם!</div>
-<div style={{fontSize:14,color:MUTED2,marginTop:6}}>כל הכבוד תמר! רצף 🔥</div>
-</Card>}
-<div style={{marginTop:24}}>
-<STitle>שיאים אישיים 🏆</STitle>
-<div style={{display:“flex”,flexDirection:“column”,gap:8}}>
-{PRS.map(pr=><Card key={pr.name} style={{padding:“12px 14px”}}>
-<div style={{display:“flex”,alignItems:“center”,gap:10}}>
-<span style={{fontSize:20}}>{pr.medal}</span>
-<div style={{flex:1}}>
-<div style={{fontSize:14,fontWeight:700}}>{pr.name}</div>
-<div style={{fontSize:11,color:MUTED2}}>{pr.date} · +{(pr.val-pr.prev).toFixed(1)} {pr.unit}</div>
-</div>
-<div style={{fontSize:22,fontWeight:900,color:GOLD}}>{pr.val} <span style={{fontSize:11,color:MUTED2}}>{pr.unit}</span></div>
-</div>
-</Card>)}
-</div>
-</div>
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Reset all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('bg-gradient-to-r', 'from-app-secondary', 'to-app-primary', 'text-white', 'shadow-md');
+                        t.classList.add('bg-white', 'text-slate-600');
+                    });
+                    
+                    // Hide all panes
+                    panes.forEach(p => p.classList.add('hidden'));
 
-  </div>;
-}
+                    // Activate clicked tab
+                    tab.classList.remove('bg-white', 'text-slate-600');
+                    tab.classList.add('bg-gradient-to-r', 'from-app-secondary', 'to-app-primary', 'text-white', 'shadow-md');
+                    
+                    // Show target pane
+                    const targetId = tab.getAttribute('data-target');
+                    const targetPane = document.getElementById(targetId);
+                    if(targetPane) targetPane.classList.remove('hidden');
+                    
+                    // Center the clicked tab smoothly
+                    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                });
+            });
+            
+            // --- CHART LOGIC ---
+            const icons = document.querySelectorAll('.graph-icon');
+            icons.forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const exerciseKey = icon.dataset.exercise;
+                    const exerciseName = icon.dataset.exerciseName;
+                    const exerciseData = progressData[exerciseKey];
+ 
+                    if (exerciseData && exerciseData.length > 0) {
+                        const modal = document.createElement('div');
+                        modal.className = "fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in";
+                        modal.innerHTML = `
+                            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 relative">
+                                <button class="absolute top-4 left-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors close-chart-modal">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                                <h3 class="text-xl font-bold text-slate-800 mb-6 px-2 border-r-4 border-app-primary">${`גרף התקדמות: ${exerciseName}`}</h3>
+                                <canvas id="modalChart" class="w-full"></canvas>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                        lucide.createIcons();
+                        
+                        const closeModal = () => modal.remove();
+                        modal.querySelector('.close-chart-modal').addEventListener('click', closeModal);
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) closeModal();
+                        });
+ 
+                        const chartCanvas = modal.querySelector('canvas').getContext('2d');
+                        
+                        let yTitle = 'משקל בקילוגרמים';
+                        if (['latPulldown', 'hipThrust'].includes(exerciseKey)) yTitle = 'משקל (ק"ג) כל צד';
+                        if (['lyingLegCurl', 'overheadTricepsExtension'].includes(exerciseKey)) yTitle = 'מספר פלטות';
+                        if (exerciseKey === 'bodyWeight') yTitle = 'משקל גוף (ק"ג)';
 
-// ── NUTRITION ──
-function Nutrition(){
-const [water,setWater]=useState(1.8);
-return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:16}}>
-<div>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>יומן תזונה</div>
-<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>{todayStr()}</div>
-</div>
-<Card>
-<div style={{display:“flex”,gap:16,alignItems:“center”}}>
-<Ring p={Math.min(100,Math.round((totCal/TARGET_CAL)*100))} color={GOLD} size={112} stroke={10}>
-<div style={{textAlign:“center”}}>
-<div style={{fontSize:21,fontWeight:900,color:GOLD}}>{totCal}</div>
-<div style={{fontSize:9,color:MUTED2}}>/ {TARGET_CAL} קק״ל</div>
-<div style={{fontSize:10,color:GREEN,fontWeight:700,marginTop:2}}>{TARGET_CAL-totCal} נותרו</div>
-</div>
-</Ring>
-<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:10}}>
-{[{l:“🥩 חלבון”,c:totP,t:130,col:GREEN},{l:“🌾 פחמימות”,c:totC,t:175,col:BLUE},{l:“🫒 שומן”,c:totF,t:58,col:ORANGE}].map(m=>
-<div key={m.l}>
-<div style={{display:“flex”,justifyContent:“space-between”,fontSize:11,marginBottom:4}}>
-<span style={{color:MUTED2}}>{m.l}</span>
-<span style={{fontWeight:700}}>{m.c}<span style={{color:MUTED,fontWeight:400}}>/{m.t}g</span></span>
-</div>
-<BarUI value={m.c} max={m.t} color={m.col} h={7}/>
-</div>
-)}
-</div>
-</div>
-</Card>
-<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}}>
-<Card style={{textAlign:“center”,padding:“14px 10px”}}>
-<div style={{fontSize:10,color:MUTED2,marginBottom:4}}>ממוצע שבועי</div>
-<div style={{fontSize:22,fontWeight:900,color:GOLD}}>{avgCal}</div>
-<div style={{fontSize:10,color:MUTED2}}>קק״ל/יום</div>
-</Card>
-<Card style={{textAlign:“center”,padding:“14px 10px”}}>
-<div style={{fontSize:10,color:MUTED2,marginBottom:4}}>עמידה במעקב</div>
-<div style={{fontSize:22,fontWeight:900,color:adh>=80?GREEN:ORANGE}}>{adh}%</div>
-<div style={{fontSize:10,color:MUTED2}}>{loggedDays.length}/7 ימים</div>
-<div style={{display:“flex”,gap:3,justifyContent:“center”,marginTop:5}}>
-{weeklyLog.map((d,i)=><div key={i} style={{width:10,height:10,borderRadius:3,background:d.ok?GREEN:”#252528”}}/>)}
-</div>
-</Card>
-</div>
-<Card style={{padding:“14px 10px”}}>
-<div style={{fontSize:12,fontWeight:700,marginBottom:10}}>קלוריות לפי יום</div>
-<ResponsiveContainer width="100%" height={100}>
-<BarChart data={weeklyLog} margin={{top:4,right:4,left:0,bottom:0}}>
-<XAxis dataKey="day" tick={{fill:MUTED2,fontSize:10}} axisLine={false} tickLine={false}/>
-<YAxis hide domain={[0,2200]}/>
-<ReferenceLine y={TARGET_CAL} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1.5}/>
-<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:8,fontSize:11}} formatter={v=>v?[`${v} קק״ל`,””]:[” לא נרשם”,””]}/>
-<Bar dataKey="cal" radius={[6,6,0,0]}>
-{weeklyLog.map((d,i)=><Cell key={i} fill={!d.ok?”#252528”:Math.abs(d.cal-TARGET_CAL)<150?GREEN:GOLD}/>)}
-</Bar>
-</BarChart>
-</ResponsiveContainer>
-</Card>
-<STitle>ארוחות</STitle>
-<div style={{display:“flex”,flexDirection:“column”,gap:10}}>
-{MEALS.map(m=><Card key={m.id}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:6}}>
-<div style={{fontSize:15,fontWeight:700}}>{m.name}</div>
-<div style={{fontSize:16,fontWeight:900,color:GOLD}}>{m.cal} קק״ל</div>
-</div>
-<div style={{fontSize:12,color:MUTED2,marginBottom:8}}>{m.items.join(” · “)}</div>
-<div style={{display:“flex”,gap:14,fontSize:11}}>
-<span style={{color:GREEN}}>ח׳ {m.p}g</span>
-<span style={{color:BLUE}}>פח׳ {m.c}g</span>
-<span style={{color:ORANGE}}>ש׳ {m.f}g</span>
-</div>
-</Card>)}
-</div>
-<div>
-<STitle>שתייה</STitle>
-<Card>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:8}}>
-<span style={{fontSize:14,fontWeight:600}}>💧 מים</span>
-<span style={{fontSize:20,fontWeight:900,color:BLUE}}>{water.toFixed(1)} / 2.5 ל׳</span>
-</div>
-<BarUI value={water} max={2.5} color={BLUE} h={10}/>
-<div style={{display:“flex”,gap:8,marginTop:12,justifyContent:“center”}}>
-{[{v:0.25,l:“250ml”},{v:0.33,l:“330ml”},{v:0.5,l:“500ml”}].map(b=>
-<button key={b.v} onClick={()=>setWater(w=>Math.min(2.5,+(w+b.v).toFixed(2)))} style={{background:”#141420”,border:“1px solid #2A2A4E”,borderRadius:10,padding:“8px 14px”,color:BLUE,fontSize:13,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”,fontWeight:700}}>+{b.l}</button>
-)}
-</div>
-</Card>
-</div>
+                        let chartOptions = {
+                            scales: { 
+                                y: { beginAtZero: false, title: { display: true, text: yTitle, font: {family: 'Assistant'} } },
+                                x: { ticks: { font: {family: 'Assistant'} } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const dataPoint = exerciseData[context.dataIndex];
+                                            if (exerciseKey === 'bodyWeight') return `משקל: ${dataPoint.weight} ק"ג`;
+                                            return `משקל: ${dataPoint.weight} | חזרות: ${dataPoint.reps}`;
+                                        }
+                                    },
+                                    titleFont: {family: 'Assistant', size: 14},
+                                    bodyFont: {family: 'Assistant', size: 14, weight: 'bold'},
+                                    padding: 12,
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    displayColors: false
+                                }
+                            },
+                            responsive: true,
+                            maintainAspectRatio: true
+                        };
+                        
+                        let chartColor = '#0ea5e9'; // primary
+                        let bgColor = 'rgba(14, 165, 233, 0.1)';
+                        
+                        if (exerciseKey === 'bodyWeight') {
+                            chartColor = '#14b8a6'; // secondary/teal
+                            bgColor = 'rgba(20, 184, 166, 0.1)';
+                        }
 
-  </div>;
-}
+                        new Chart(chartCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: exerciseData.map(d => d.date),
+                                datasets: [{
+                                    label: exerciseKey === 'bodyWeight' ? 'משקל גוף (ק"ג)' : 'משקל עבודה (ק"ג)',
+                                    data: exerciseData.map(d => d.weight),
+                                    backgroundColor: bgColor,
+                                    borderColor: chartColor,
+                                    borderWidth: 3,
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderColor: chartColor,
+                                    pointBorderWidth: 2,
+                                    pointRadius: 4,
+                                    tension: 0.3,
+                                    fill: true,
+                                }]
+                            },
+                            options: chartOptions
+                        });
+                    } else {
+                        alert("טרם הוזנו נתונים לגרף זה.");
+                    }
+                });
+            });
 
-// ── PROGRESS ──
-function Progress(){
-const [newWeight,setNewWeight]=useState(””);
-const lastTrend=66.8, prevTrend=67.1;
-return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:18}}>
-<div>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>מעקב התקדמות</div>
-<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>גרפים ומדידות</div>
-</div>
-<Card style={{background:“linear-gradient(135deg,#0E1A0E,#0A120A)”,borderColor:”#1A2E1A”}}>
-<div style={{fontSize:10,color:GREEN,fontWeight:700,letterSpacing:1.5,marginBottom:8}}>● המשקל האמיתי שלך (EWMA)</div>
-<div style={{display:“flex”,alignItems:“baseline”,gap:10,marginBottom:4}}>
-<div style={{fontSize:48,fontWeight:900,lineHeight:1}}>{lastTrend}</div>
-<div style={{fontSize:20,color:MUTED2}}>ק״ג</div>
-<div style={{fontSize:14,color:GREEN,fontWeight:700}}>▼ {(prevTrend-lastTrend).toFixed(1)}</div>
-</div>
-<div style={{fontSize:12,color:MUTED2,marginBottom:12}}>שקילה אחרונה: <span style={{color:TEXT}}>{CUR_W} ק״ג</span> · פער: <span style={{color:GOLD}}>+{(CUR_W-lastTrend).toFixed(1)} ק״ג</span></div>
-<div style={{display:“flex”,gap:20}}>
-{[{l:“קצב שבועי”,v:`-${RATE} ק״ג`,c:GREEN},{l:“מהתחלה”,v:`-${(START_W-lastTrend).toFixed(1)} ק״ג`,c:GREEN},{l:“ליעד”,v:`${(lastTrend-GOAL_W).toFixed(1)} ק״ג`,c:GOLD}].map(s=>
-<div key={s.l}><div style={{fontSize:10,color:MUTED2,marginBottom:2}}>{s.l}</div><div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div></div>
-)}
-</div>
-</Card>
-<GoalETA/>
-<div>
-<STitle>גרף משקל · EWMA מול מדידות</STitle>
-<Card style={{padding:“14px 10px”}}>
-<ResponsiveContainer width="100%" height={190}>
-<AreaChart data={weightData} margin={{top:4,right:4,left:0,bottom:0}}>
-<defs>
-<linearGradient id="gG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="5%" stopColor={GREEN} stopOpacity={0.25}/>
-<stop offset="95%" stopColor={GREEN} stopOpacity={0}/>
-</linearGradient>
-</defs>
-<XAxis dataKey="date" tick={{fill:MUTED2,fontSize:9}} axisLine={false} tickLine={false}/>
-<YAxis domain={[64.5,70.5]} tick={{fill:MUTED2,fontSize:9}} axisLine={false} tickLine={false} width={28}/>
-<ReferenceLine y={GOAL_W} stroke={GOLD} strokeDasharray="4 4" strokeWidth={1}/>
-<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:10,fontSize:11,direction:“rtl”}} formatter={(v,n)=>[`${v} ק״ג`,n===“trend”?“מגמה EWMA”:“נמדד”]}/>
-<Area type=“monotone” dataKey=“w” stroke={`${GOLD}77`} strokeWidth={1.5} fill=“none” dot={{fill:GOLD,r:3,strokeWidth:0}} name=“raw”/>
-<Area type="monotone" dataKey="trend" stroke={GREEN} strokeWidth={3} fill="url(#gG)" dot={false} name="trend"/>
-</AreaChart>
-</ResponsiveContainer>
-</Card>
-</div>
-<div>
-<STitle>מדידות גוף</STitle>
-<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}}>
-{[{l:“מותן”,c:“72 ס״מ”,d:“−3 ס״מ”,pos:true},{l:“ירכיים”,c:“94 ס״מ”,d:“−2 ס״מ”,pos:true},{l:“חזה”,c:“86 ס״מ”,d:“−1 ס״מ”,pos:true},{l:“זרוע”,c:“30 ס״מ”,d:”+1 ס״מ”,pos:false}].map(m=>
-<Card key={m.l} style={{padding:14}}>
-<div style={{fontSize:11,color:MUTED2,marginBottom:5}}>{m.l}</div>
-<div style={{fontSize:20,fontWeight:800}}>{m.c}</div>
-<div style={{fontSize:11,color:m.pos?GREEN:GOLD,fontWeight:600,marginTop:4}}>{m.d} מהתחלה</div>
-</Card>
-)}
-</div>
-</div>
-<Card style={{background:”#111009”,borderColor:”#252210”}}>
-<div style={{fontSize:12,fontWeight:700,color:GOLD,marginBottom:12}}>➕ הוספת שקילה</div>
-<div style={{display:“flex”,gap:10}}>
-<input type=“number” value={newWeight} placeholder=“66.3” onChange={e=>setNewWeight(e.target.value)} style={{flex:1,background:”#1A1A1E”,border:“1px solid #2A2A2E”,borderRadius:12,padding:“12px 14px”,color:TEXT,fontSize:18,fontFamily:”‘Heebo’,sans-serif”}}/>
-<button onClick={()=>setNewWeight(””)} style={{background:GOLD,color:”#000”,border:“none”,borderRadius:12,padding:“12px 20px”,fontWeight:900,fontSize:15,cursor:“pointer”,fontFamily:”‘Heebo’,sans-serif”}}>שמור</button>
-</div>
-<div style={{fontSize:11,color:MUTED,marginTop:8}}>* שקול בוקר, בצום, אחרי שירותים – לדיוק מרבי</div>
-</Card>
+            // --- VIDEO MODAL LOGIC ---
+            const videoIcons = document.querySelectorAll('.video-icon');
+            const videoModal = document.getElementById('videoModal');
+            const videoModalInner = videoModal.querySelector('div');
+            const videoModalExerciseName = document.getElementById('videoModalExerciseName');
+            const closeVideoModalBtn = document.getElementById('closeVideoModal');
+            const embedVideoButton = document.getElementById('embedVideoButton');
+            const youtubeLinkInput = document.getElementById('youtubeLinkInput');
+            const videoEmbedContainer = document.getElementById('videoEmbedContainer');
 
-  </div>;
-}
+            const openVideoModal = (exerciseName) => {
+                videoModalExerciseName.textContent = exerciseName;
+                videoEmbedContainer.innerHTML = '';
+                videoEmbedContainer.classList.add('hidden');
+                youtubeLinkInput.value = '';
+                
+                videoModal.classList.remove('hidden');
+                setTimeout(() => {
+                    videoModal.classList.remove('opacity-0');
+                    videoModalInner.classList.remove('scale-95');
+                }, 10);
+            };
 
-// ── ANALYTICS ──
-function Analytics(){
-const months=[{m:“מרץ”,cal:1620},{m:“אפריל”,cal:1550},{m:“מאי”,cal:avgCal}];
-return <div style={{padding:“22px 16px 0”,display:“flex”,flexDirection:“column”,gap:18}}>
-<div>
-<div style={{fontSize:10,color:GOLD,fontWeight:700,letterSpacing:1,marginBottom:3}}>ניתוח מעמיק</div>
-<div style={{fontSize:26,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>Analytics 📊</div>
-</div>
-<Card style={{background:“linear-gradient(135deg,#101018,#0E0E16)”,borderColor:”#22223A”}}>
-<div style={{fontSize:10,color:BLUE,fontWeight:700,letterSpacing:1,marginBottom:8}}>TDEE · הוצאה אנרגטית יומית</div>
-<div style={{display:“flex”,gap:20,marginBottom:14}}>
-<div><div style={{fontSize:36,fontWeight:900}}>{TDEE}</div><div style={{fontSize:11,color:MUTED2}}>קק״ל/יום</div></div>
-<div style={{flex:1,display:“flex”,flexDirection:“column”,gap:5,justifyContent:“center”}}>
-<div style={{fontSize:12,color:MUTED2}}>ממוצע: <span style={{color:TEXT,fontWeight:700}}>{avgCal}</span></div>
-<div style={{fontSize:12,color:MUTED2}}>גירעון: <span style={{color:GREEN,fontWeight:700}}>-{dailyDef} קק״ל</span></div>
-<div style={{fontSize:12,color:MUTED2}}>קצב: <span style={{color:GREEN,fontWeight:700}}>-{RATE} ק״ג/שבוע</span></div>
-</div>
-</div>
-<div style={{background:”#1A1A2A”,borderRadius:10,padding:10,fontSize:10,color:MUTED2,lineHeight:1.6}}>
-🧮 <strong style={{color:TEXT}}>חישוב:</strong> {avgCal} + {dailyDef} = <strong style={{color:GOLD}}>{TDEE} קק״ל</strong>
-<br/>מחושב מצריכה + שינוי משקל בפועל, לא מ-BMR גנרי
-</div>
-</Card>
-<div>
-<STitle>מאזן אנרגטי שבועי</STitle>
-<Card style={{padding:“14px 10px”}}>
-<ResponsiveContainer width="100%" height={110}>
-<BarChart data={weeklyLog} margin={{top:4,right:4,left:0,bottom:0}}>
-<XAxis dataKey="day" tick={{fill:MUTED2,fontSize:10}} axisLine={false} tickLine={false}/>
-<YAxis hide/>
-<ReferenceLine y={TDEE} stroke={BLUE} strokeDasharray="4 4" strokeWidth={1.5}/>
-<Tooltip contentStyle={{background:CARD2,border:“1px solid #2A2A2E”,borderRadius:8,fontSize:11}} formatter={(v)=>v?[`${v>TDEE?"+":""}${v-TDEE} קק״ל`,“מאזן”]:[” לא נרשם”,””]}/>
-<Bar dataKey="cal" radius={[4,4,0,0]}>
-{weeklyLog.map((d,i)=><Cell key={i} fill={!d.ok?”#252528”:d.cal<=TDEE?GREEN:ORANGE}/>)}
-</Bar>
-</BarChart>
-</ResponsiveContainer>
-<div style={{fontSize:9,color:MUTED2,textAlign:“center”,marginTop:4}}>
-- - TDEE {TDEE} · <span style={{color:GREEN}}>■ גירעון</span> · <span style={{color:ORANGE}}>■ עודף</span>
-</div>
-</Card>
-</div>
-<div>
-<STitle>ממוצע קלוריות לפי חודש</STitle>
-<Card>
-{months.map(m=><div key={m.m} style={{marginBottom:12}}>
-<div style={{display:“flex”,justifyContent:“space-between”,fontSize:12,marginBottom:5}}>
-<span style={{fontWeight:700}}>{m.m}</span>
-<span style={{color:Math.abs(m.cal-TARGET_CAL)<100?GREEN:GOLD}}>{m.cal} <span style={{color:MUTED2,fontWeight:400}}>קק״ל</span></span>
-</div>
-<BarUI value={m.cal} max={2200} color={Math.abs(m.cal-TARGET_CAL)<100?GREEN:GOLD} h={8}/>
-</div>)}
-</Card>
-</div>
-<div>
-<STitle>עמידה במעקב</STitle>
-<Card>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“flex-start”,marginBottom:14}}>
-<div>
-<div style={{fontSize:36,fontWeight:900,color:adh>=80?GREEN:ORANGE}}>{adh}%</div>
-<div style={{fontSize:12,color:MUTED2}}>{loggedDays.length}/7 ימים</div>
-</div>
-<div style={{fontSize:11,color:MUTED2,maxWidth:160,lineHeight:1.6,textAlign:“right”}}>המערכת מסתגלת לפי מה שנרשם בפועל, כמו MacroFactor 🎯</div>
-</div>
-<div style={{display:“flex”,gap:4,justifyContent:“center”,alignItems:“flex-end”}}>
-{weeklyLog.map((d,i)=>
-<div key={i} style={{display:“flex”,flexDirection:“column”,alignItems:“center”,gap:3}}>
-<div style={{width:28,height:Math.max(8,d.ok?Math.round((d.cal/2000)*55):8),background:d.ok?GREEN:”#252528”,borderRadius:3}}/>
-<div style={{fontSize:9,color:MUTED2}}>{d.day}</div>
-</div>
-)}
-</div>
-</Card>
-</div>
-<div>
-<STitle>עמידה ביעדי מאקרו</STitle>
-<Card>
-{[{l:“חלבון”,avg:88,t:130,col:GREEN},{l:“פחמימות”,avg:145,t:175,col:BLUE},{l:“שומן”,avg:48,t:58,col:ORANGE}].map(m=>
-<div key={m.l} style={{marginBottom:12}}>
-<div style={{display:“flex”,justifyContent:“space-between”,fontSize:12,marginBottom:5}}>
-<span style={{color:MUTED2}}>{m.l}</span>
-<span style={{fontWeight:700}}>{m.avg}g<span style={{color:MUTED,fontWeight:400}}> / {m.t}g</span>
-<span style={{color:m.avg>=m.t*0.9?GREEN:ORANGE,marginRight:5,fontWeight:700}}> {Math.round((m.avg/m.t)*100)}%</span></span>
-</div>
-<BarUI value={m.avg} max={m.t} color={m.col} h={8}/>
-</div>
-)}
-</Card>
-</div>
+            const closeVideoModal = () => {
+                videoModal.classList.add('opacity-0');
+                videoModalInner.classList.add('scale-95');
+                setTimeout(() => {
+                    videoModal.classList.add('hidden');
+                    videoEmbedContainer.innerHTML = '';
+                }, 300);
+            };
 
-  </div>;
-}
+            videoIcons.forEach(icon => {
+                icon.closest('.group').addEventListener('click', (e) => {
+                    if(e.target.closest('a')) return;
+                    
+                    const li = e.target.closest('li');
+                    const spanText = li.querySelector('span:first-child').textContent.trim();
+                    openVideoModal(spanText);
+                });
+            });
 
-// ── APP ──
-const TABS=[
-{id:“dashboard”,icon:“⌂”,label:“בית”},
-{id:“workout”,icon:“💪”,label:“אימון”},
-{id:“nutrition”,icon:“🍽”,label:“תזונה”},
-{id:“progress”,icon:“📈”,label:“מעקב”},
-{id:“analytics”,icon:“🧠”,label:“ניתוח”},
-];
+            if(closeVideoModalBtn) closeVideoModalBtn.addEventListener('click', closeVideoModal);
+            if(videoModal) {
+                videoModal.addEventListener('click', (e) => {
+                    if(e.target === videoModal) closeVideoModal();
+                });
+            }
+            if(embedVideoButton) {
+                 embedVideoButton.addEventListener('click', () => {
+                    const url = youtubeLinkInput.value;
+                    const videoId = getYouTubeID(url);
+                    if (videoId) {
+                        embedVideo(videoId);
+                    } else {
+                        videoEmbedContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-rose-50 text-rose-500 font-bold p-4 text-center rounded-xl">קישור לא תקין. אנא הדבק קישור מלא מיוטיוב.</div>';
+                        videoEmbedContainer.classList.remove('hidden');
+                    }
+                });
+            }
 
-export default function App(){
-const [tab,setTab]=useState(“dashboard”);
-return <div style={{background:BG,minHeight:“100vh”,color:TEXT,fontFamily:”‘Heebo’,sans-serif”,direction:“rtl”,maxWidth:440,margin:“0 auto”,paddingBottom:84}}>
-<div style={{background:”#0E0E11”,padding:“14px 20px 12px”,borderBottom:“1px solid #1A1A1E”,position:“sticky”,top:0,zIndex:50,display:“flex”,alignItems:“center”,justifyContent:“space-between”}}>
-<div>
-<div style={{fontSize:9,color:MUTED,letterSpacing:2.5,textTransform:“uppercase”,marginBottom:2}}>COACHED BY DAN Z</div>
-<div style={{fontSize:20,fontFamily:”‘Frank Ruhl Libre’,serif”,fontWeight:900}}>תמר ס׳ <span style={{color:GOLD}}>✦</span></div>
-</div>
-<div style={{width:42,height:42,borderRadius:“50%”,background:`linear-gradient(135deg,${GOLD},${GOLD_DIM})`,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:18,fontWeight:900,color:”#000”}}>ת</div>
-</div>
-{tab===“dashboard”&&<Dashboard setTab={setTab}/>}
-{tab===“workout”&&<Workout/>}
-{tab===“nutrition”&&<Nutrition/>}
-{tab===“progress”&&<Progress/>}
-{tab===“analytics”&&<Analytics/>}
-<div style={{position:“fixed”,bottom:0,left:“50%”,transform:“translateX(-50%)”,width:“100%”,maxWidth:440,background:”#0A0A0D”,borderTop:“1px solid #1A1A1E”,display:“flex”,paddingBottom:16,paddingTop:8,zIndex:100}}>
-{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,background:“none”,border:“none”,cursor:“pointer”,display:“flex”,flexDirection:“column”,alignItems:“center”,gap:3,color:tab===t.id?GOLD:MUTED,transition:“color 0.2s”,padding:“4px 0”,fontFamily:”‘Heebo’,sans-serif”}}>
-<span style={{fontSize:22,lineHeight:1}}>{t.icon}</span>
-<span style={{fontSize:10,fontWeight:tab===t.id?800:400}}>{t.label}</span>
-</button>)}
-</div>
+            function embedVideo(videoId) {
+                videoEmbedContainer.innerHTML = `
+                    <iframe class="w-full h-full rounded-2xl" src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+                `;
+                videoEmbedContainer.classList.remove('hidden');
+            }
 
-  </div>;
-}
-
-ReactDOM.createRoot(document.getElementById(‘root’)).render(<App/>);
-</script>
-
+            function getYouTubeID(url) {
+                const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|\/|embed\/|v\/|)([^"&?\/\s]{11})/;
+                const match = url.match(regex);
+                return match ? match[1] : null;
+            }
+        });
+    </script>
 </body>
 </html>
